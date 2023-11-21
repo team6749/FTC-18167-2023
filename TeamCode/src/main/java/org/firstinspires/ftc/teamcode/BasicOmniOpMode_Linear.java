@@ -33,6 +33,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.RobotHardware;
@@ -78,13 +80,26 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot.init();
-//        // Initialize the hardware variables. Note that the strings used here must correspond
-//        // to the names assigned during the robot configuration step on the DS or RC devices.
-//        leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftfront_drive");
-//        leftBackDrive  = hardwareMap.get(DcMotor.class, "leftback_drive");
-//        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightfront_drive");
-//        rightBackDrive = hardwareMap.get(DcMotor.class, "rightback_drive");
-//
+       // Initialize the hardware variables. Note that the strings used here must correspond
+       // to the names assigned during the robot configuration step on the DS or RC devices.
+       DcMotor leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftfront_drive");
+        DcMotor leftBackDrive  = hardwareMap.get(DcMotor.class, "leftback_drive");
+        DcMotor  rightFrontDrive = hardwareMap.get(DcMotor.class, "rightfront_drive");
+        DcMotor  rightBackDrive = hardwareMap.get(DcMotor.class, "rightback_drive");
+
+        DcMotor baseRotationMotor = hardwareMap.get(DcMotor.class, "baseRotationMotor");
+        DcMotor shaftMotor = hardwareMap.get(DcMotor.class, "shaftMotor");
+        // TODO: DEFINE ENCODER HERE
+        //TODO: remember the SEMI-COLONS!
+
+        Servo wrist = hardwareMap.get(Servo.class, "wrist");
+        Servo leftClaw = hardwareMap.get(Servo.class, "leftClaw");
+        Servo rightClaw = hardwareMap.get(Servo.class, "rightClaw");
+
+
+
+
+
 //        // ########################################################################################
 //        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
 //        // ########################################################################################
@@ -95,10 +110,10 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 //        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
 //        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
 //        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-//        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-//        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-//        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-//        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+       leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+       leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+       rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+       rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
@@ -146,19 +161,30 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             //      the setDirection() calls above.
             // Once the correct motors move in the correct direction re-comment this code.
 
-            /*
-            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-            leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
-            */
+//            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
+//            leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
+//            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
+//            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
 
             // Send calculated power to wheels
             robot.setDrivePower(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
-//            leftFrontDrive.setPower(leftFrontPower);
-//            rightFrontDrive.setPower(rightFrontPower);
-//            leftBackDrive.setPower(leftBackPower);
-//            rightBackDrive.setPower(rightBackPower);
+           leftFrontDrive.setPower(leftFrontPower);
+           rightFrontDrive.setPower(rightFrontPower);
+           leftBackDrive.setPower(leftBackPower);
+           rightBackDrive.setPower(rightBackPower);
+
+
+           double shaftMotorPower = 0.0;
+           DcMotorSimple.Direction shaftDirection = DcMotorSimple.Direction.FORWARD;
+
+           if (gamepad1.dpad_up || gamepad1.dpad_down) {
+               shaftMotorPower = 1;
+
+               shaftDirection = gamepad1.dpad_up ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+           }
+           shaftMotor.setDirection(shaftDirection);
+           shaftMotor.setPower(shaftMotorPower);
+
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());

@@ -21,6 +21,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     namespace = 'com.qualcomm.ftcrobotcontroller'
+
+    task wrapper(type: Wrapper) {
+        gradleVersion = '6.7.1'
+    }
+
+    tasks.register("prepareKotlinBuildScriptModel"){}
+
 }
 
 apply from: '../build.dependencies.gradle'
