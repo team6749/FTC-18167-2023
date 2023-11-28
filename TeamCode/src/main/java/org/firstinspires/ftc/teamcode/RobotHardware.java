@@ -39,8 +39,8 @@ public class RobotHardware {
 
     // Define Drive constants.  Make them public so they CAN be used by the calling OpMode
     public static final double MID_SERVO = 0.5;
-    public static final double CLAW_OPEN_POSITION = .3; // TODO -- figure out what this should be
-    public static final double CLAW_CLOSED_POSITION = .2; // TODO -- figure out what this should be
+    public static final double CLAW_OPEN_POSITION = .5; // TODO -- figure out what this should be
+    public static final double CLAW_CLOSED_POSITION = 0; // TODO -- figure out what this should be
     DcMotor baseRotationMotor = null;
     DcMotor shaftMotor = null;
     /* Declare OpMode members. */
@@ -56,9 +56,8 @@ public class RobotHardware {
 //    public static final double HAND_SPEED      =  0.02 ;  // sets rate to move servo
 //    public static final double ARM_UP_POWER    =  0.45 ;
 //    public static final double ARM_DOWN_POWER  = -0.45 ;
-    private Servo leftClaw = null;
-    private Servo rightClaw = null;
-
+    public static Servo leftClaw = null;
+    public static Servo rightClaw = null;
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public RobotHardware(LinearOpMode opmode) {
         myOpMode = opmode;
@@ -105,6 +104,7 @@ public class RobotHardware {
 
         myOpMode.telemetry.addData(">", "Hardware Initialized");
         myOpMode.telemetry.update();
+
     }
 
 
@@ -149,6 +149,8 @@ public class RobotHardware {
         baseRotationMotor.setDirection(baseRotationMotorDirection);
         baseRotationMotor.setPower(baseRotationMotorPower);
     }
+
+
     /**
      * Send the two hand-servos to opposing (mirrored) positions, based on the passed offset.
      *

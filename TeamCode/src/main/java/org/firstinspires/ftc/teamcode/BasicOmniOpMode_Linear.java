@@ -127,6 +127,9 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+            telemetry.addData("Right Get pos", "%4.2f", RobotHardware.rightClaw.getPosition());
+            telemetry.addData("Left Get pos", "%4.2f", RobotHardware.leftClaw.getPosition());
+
             telemetry.update();
         }
     }
