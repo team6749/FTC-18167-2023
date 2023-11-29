@@ -114,14 +114,21 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             // Move Claws
             if (gamepad1.a || gamepad1.b) {
                 double clawPosition = gamepad1.a ? RobotHardware.CLAW_OPEN_POSITION : RobotHardware.CLAW_CLOSED_POSITION;
-                if (!gamepad1.left_bumper) {
-                    robot.setRightClawPositionAndDirection(clawPosition, Servo.Direction.REVERSE);
-                }
                 if (!gamepad1.right_bumper) {
-                    robot.setLeftClawPositionAndDirection(clawPosition, Servo.Direction.FORWARD);
+                    robot.setRightClawPositionAndDirection(clawPosition, Servo.Direction.FORWARD);
+                }
+                if (!gamepad1.left_bumper) {
+                    robot.setLeftClawPositionAndDirection(clawPosition, Servo.Direction.REVERSE);
                 }
             }
+            //wrist
+            if (gamepad1.x || gamepad1.y) {
+                double wristPosition = gamepad1.x ? RobotHardware.WRIST_DOWN_POSITION : RobotHardware.WRIST_UP_POSITION;
+                Servo.Direction wristDirection = gamepad1.x ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
+                robot.setWristPositionAndDirection(wristPosition, wristDirection);
+                telemetry.addData("wrist", "wrist position: " + wristPosition);
 
+            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());

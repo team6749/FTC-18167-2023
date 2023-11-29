@@ -39,8 +39,11 @@ public class RobotHardware {
 
     // Define Drive constants.  Make them public so they CAN be used by the calling OpMode
     public static final double MID_SERVO = 0.5;
-    public static final double CLAW_OPEN_POSITION = .5; // TODO -- figure out what this should be
-    public static final double CLAW_CLOSED_POSITION = 0; // TODO -- figure out what this should be
+    public static final double CLAW_OPEN_POSITION = 1.0;
+    public static final double CLAW_CLOSED_POSITION = 0;
+
+    public static final double WRIST_DOWN_POSITION = 0; // TODO -- figure out what this should be
+    public static final double WRIST_UP_POSITION = 1.0; // TODO -- figure out what this should be
     DcMotor baseRotationMotor = null;
     DcMotor shaftMotor = null;
     /* Declare OpMode members. */
