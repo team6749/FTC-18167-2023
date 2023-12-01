@@ -100,15 +100,15 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
 
             // Move Base Rotation Motor
-            double baseRotationMotorPower = 0.0;
-            DcMotorSimple.Direction baseRotationMotorDirection = DcMotorSimple.Direction.FORWARD;
+//            double baseRotationMotorPower = 0.0;
+//            DcMotorSimple.Direction baseRotationMotorDirection = DcMotorSimple.Direction.FORWARD;
 
-            if (gamepad1.dpad_up || gamepad1.dpad_down) {
-                baseRotationMotorPower = 1;
-
-                baseRotationMotorDirection = gamepad1.dpad_up ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
-            }
-            robot.setBaseRotationMotorPowerAndDirection(baseRotationMotorPower, baseRotationMotorDirection);
+//            if (gamepad1.dpad_up || gamepad1.dpad_down) {
+//                baseRotationMotorPower = 1;
+//
+//                baseRotationMotorDirection = gamepad1.dpad_up ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+//            }
+//            robot.setBaseRotationMotorPosAndDirection(baseRotationMotorPower, baseRotationMotorDirection);
 
 
             // Move Claws
@@ -127,7 +127,14 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 Servo.Direction wristDirection = gamepad1.x ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
                 robot.setWristPositionAndDirection(wristPosition, wristDirection);
                 telemetry.addData("wrist", "wrist position: " + wristPosition);
+            }
 
+            if (gamepad1.right_trigger > 0.5 || gamepad1.left_trigger > 0.5) {
+                int basePos = gamepad1.right_trigger > 0.5 ? RobotHardware.BASE_ROTATION_PICKUP : RobotHardware.BASE_ROTATION_PLACE;
+                DcMotorSimple.Direction baseDir = gamepad1.right_trigger > 0.5 ? DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE;
+                telemetry.addData("BaseRotation pos and Dir", "%d, %s", basePos, baseDir);
+
+                robot.setBaseRotationMotorPosAndDirection(basePos,baseDir);
             }
 
             // Show the elapsed game time and wheel power.
@@ -136,7 +143,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Right Get pos", "%4.2f", RobotHardware.rightClaw.getPosition());
             telemetry.addData("Left Get pos", "%4.2f", RobotHardware.leftClaw.getPosition());
-
+            telemetry.addData("Base Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
             telemetry.update();
         }
     }

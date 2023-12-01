@@ -42,19 +42,29 @@ public class RobotHardware {
     public static final double CLAW_OPEN_POSITION = 1.0;
     public static final double CLAW_CLOSED_POSITION = 0;
 
-    public static final double WRIST_DOWN_POSITION = 0; // TODO -- figure out what this should be
-    public static final double WRIST_UP_POSITION = 1.0; // TODO -- figure out what this should be
-    DcMotor baseRotationMotor = null;
+    public static final double WRIST_DOWN_POSITION = 0;
+    public static final double WRIST_UP_POSITION = 1.0;
+
+    public static final int BASE_ROTATION_PICKUP = 0;
+
+    public static final int BASE_ROTATION_PLACE = -3900;
+
+
     DcMotor shaftMotor = null;
     /* Declare OpMode members. */
     private LinearOpMode myOpMode = null;   // gain access to methods in the calling OpMode.
     // Define Motor and Servo objects  (Make them private so they can't be accessed externally)
     private DcMotor leftFrontDrive = null;
-    // TODO: DEFINE ENCODER HERE
     //TODO: remember the SEMI-COLONS!
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+
+    public static DcMotor baseRotationMotor = null;
+
+    // TODO: DEFINE ENCODER HERE
+//    private DutyCycleEncoder
+
     private Servo wrist = null;
 //    public static final double HAND_SPEED      =  0.02 ;  // sets rate to move servo
 //    public static final double ARM_UP_POWER    =  0.45 ;
@@ -97,6 +107,16 @@ public class RobotHardware {
 
 
         baseRotationMotor = myOpMode.hardwareMap.get(DcMotor.class, "baseRotationMotor");
+
+        baseRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        baseRotationMotor.setTargetPosition(0);
+        baseRotationMotor.setPower(1);
+
+        baseRotationMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+//        baseRotationMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        baseRotationMotor.setTargetPosition(-50);
+
         shaftMotor = myOpMode.hardwareMap.get(DcMotor.class, "shaftMotor");
         // TODO: DEFINE ENCODER HERE
         //TODO: remember the SEMI-COLONS!
@@ -148,9 +168,18 @@ public class RobotHardware {
         rightClaw.setPosition(rightClawPosition);
     }
 
-    public void setBaseRotationMotorPowerAndDirection(double baseRotationMotorPower, DcMotorSimple.Direction baseRotationMotorDirection) {
+    public void setBaseRotationMotorPosAndDirection(int baseRotationMotorPos, DcMotorSimple.Direction baseRotationMotorDirection) {
         baseRotationMotor.setDirection(baseRotationMotorDirection);
-        baseRotationMotor.setPower(baseRotationMotorPower);
+        baseRotationMotor.setTargetPosition(baseRotationMotorPos);
+        baseRotationMotor.setPower(1);
+
+        baseRotationMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (baseRotationMotor.isBusy()) {
+            myOpMode.telemetry.addData("Current Position", baseRotationMotor.getCurrentPosition());
+            myOpMode.telemetry.addData("Target Position", baseRotationMotorPos);
+            myOpMode.telemetry.update();
+        }
+//        baseRotationMotor.setPower(1);
     }
 
 
