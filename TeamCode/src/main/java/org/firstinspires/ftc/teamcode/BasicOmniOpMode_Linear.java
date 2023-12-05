@@ -130,11 +130,14 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             }
 
             if (gamepad1.right_trigger > 0.5 || gamepad1.left_trigger > 0.5) {
-                int basePos = gamepad1.right_trigger > 0.5 ? RobotHardware.BASE_ROTATION_PICKUP : RobotHardware.BASE_ROTATION_PLACE;
-                DcMotorSimple.Direction baseDir = gamepad1.right_trigger > 0.5 ? DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE;
-                telemetry.addData("BaseRotation pos and Dir", "%d, %s", basePos, baseDir);
+//                int basePos = gamepad1.right_trigger > 0.5 ? RobotHardware.BASE_ROTATION_PICKUP : RobotHardware.BASE_ROTATION_PLACE;
+//                DcMotorSimple.Direction baseDir = gamepad1.right_trigger > 0.5 ? DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE;
+//                telemetry.addData("BaseRotation pos and Dir", "%d, %s", basePos, baseDir);
 
-                robot.setBaseRotationMotorPosAndDirection(basePos,baseDir);
+                //       if(robot.no-worky); thanks ben
+                //            robot.fix-it
+
+
             }
 
             // Show the elapsed game time and wheel power.
@@ -144,7 +147,9 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Right Get pos", "%4.2f", RobotHardware.rightClaw.getPosition());
             telemetry.addData("Left Get pos", "%4.2f", RobotHardware.leftClaw.getPosition());
             telemetry.addData("Base Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
+            telemetry.addData("Number thing", RobotHardware.baseRotationMotor.getPower());
             telemetry.update();
+            robot.testFunc();
         }
     }
 }

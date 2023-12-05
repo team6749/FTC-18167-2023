@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.sax.StartElementListener;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -106,12 +108,10 @@ public class RobotHardware {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
 
-        baseRotationMotor = myOpMode.hardwareMap.get(DcMotor.class, "baseRotationMotor");
+        baseRotationMotor = myOpMode.hardwareMap.get(DcMotor.class, "brm");
 
         baseRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         baseRotationMotor.setTargetPosition(0);
-        baseRotationMotor.setPower(1);
-
         baseRotationMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 //        baseRotationMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -169,17 +169,23 @@ public class RobotHardware {
     }
 
     public void setBaseRotationMotorPosAndDirection(int baseRotationMotorPos, DcMotorSimple.Direction baseRotationMotorDirection) {
+
         baseRotationMotor.setDirection(baseRotationMotorDirection);
-        baseRotationMotor.setTargetPosition(baseRotationMotorPos);
+        baseRotationMotor.setTargetPosition(3000);
         baseRotationMotor.setPower(1);
 
-        baseRotationMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (baseRotationMotor.isBusy()) {
-            myOpMode.telemetry.addData("Current Position", baseRotationMotor.getCurrentPosition());
-            myOpMode.telemetry.addData("Target Position", baseRotationMotorPos);
-            myOpMode.telemetry.update();
-        }
+        myOpMode.telemetry.addData("BASE TAEGET POS", baseRotationMotor.getTargetPosition());
+
+        // we have identifyed that the target pos is changing and the direction is changing, but the motor is not moving to the target position
+
+
+//        while (baseRotationMotor.isBusy()) {
+//            myOpMode.telemetry.addData("Current Position", baseRotationMotor.getCurrentPosition());
+//            myOpMode.telemetry.addData("Target Position", baseRotationMotorPos);
+//            myOpMode.telemetry.update();
+//        }
 //        baseRotationMotor.setPower(1);
+
     }
 
 
@@ -193,4 +199,8 @@ public class RobotHardware {
 //        leftHand.setPosition(MID_SERVO + offset);
 //        rightHand.setPosition(MID_SERVO - offset);
 //    }
+
+    public void testFunc(){
+        baseRotationMotor.setPower(1);
+    }
 }
