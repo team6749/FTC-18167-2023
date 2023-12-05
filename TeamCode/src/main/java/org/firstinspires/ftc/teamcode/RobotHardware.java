@@ -171,9 +171,11 @@ public class RobotHardware {
     public void setBaseRotationMotorPosAndDirection(int baseRotationMotorPos, DcMotorSimple.Direction baseRotationMotorDirection) {
 
         baseRotationMotor.setDirection(baseRotationMotorDirection);
-        baseRotationMotor.setTargetPosition(3000);
+        baseRotationMotor.setTargetPosition(3000); //on a scale of 0 to 8192
         baseRotationMotor.setPower(1);
-
+        // TODO MAKE THIS FUNCTION WORK
+        // TODO MAKE TPR TO DEGREES FUNCTION
+        
         myOpMode.telemetry.addData("BASE TAEGET POS", baseRotationMotor.getTargetPosition());
 
         // we have identifyed that the target pos is changing and the direction is changing, but the motor is not moving to the target position
