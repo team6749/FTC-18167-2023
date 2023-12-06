@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -130,13 +131,9 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             }
 
             if (gamepad1.right_trigger > 0.5 || gamepad1.left_trigger > 0.5) {
-//                int basePos = gamepad1.right_trigger > 0.5 ? RobotHardware.BASE_ROTATION_PICKUP : RobotHardware.BASE_ROTATION_PLACE;
-//                DcMotorSimple.Direction baseDir = gamepad1.right_trigger > 0.5 ? DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE;
-//                telemetry.addData("BaseRotation pos and Dir", "%d, %s", basePos, baseDir);
 
-                //       if(robot.no-worky); thanks ben
-                //            robot.fix-it
-
+                DcMotorSimple.Direction dir = gamepad1.right_trigger > 0.5 ? DcMotorSimple.Direction.FORWARD: DcMotorSimple.Direction.REVERSE;
+                robot.setBaseRotationMotorPosAndDirection(dir);
 
             }
 
@@ -149,7 +146,6 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Base Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
             telemetry.addData("Number thing", RobotHardware.baseRotationMotor.getPower());
             telemetry.update();
-            robot.testFunc();
         }
     }
 }
