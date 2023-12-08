@@ -83,7 +83,6 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 rightBackPower /= max;
             }
 
-
             // Send calculated power to wheels
             robot.setDrivePower(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
 
@@ -91,6 +90,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             double shaftMotorPower = 0.0;
             DcMotorSimple.Direction shaftDirection = DcMotorSimple.Direction.FORWARD;
 
+            // shaft - move arm up/down
             if (gamepad1.dpad_right || gamepad1.dpad_left) {
                 shaftMotorPower = 1;
 
@@ -98,18 +98,16 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             }
             robot.setShaftPowerAndDirection(shaftMotorPower, shaftDirection);
 
+            // TODO: It makes more sense to switch base rotation and shaft movement controls (updown and leftright) Just a tought
 
-            // Move Base Rotation Motor
-//            double baseRotationMotorPower = 0.0;
-//            DcMotorSimple.Direction baseRotationMotorDirection = DcMotorSimple.Direction.FORWARD;
-
-//            if (gamepad1.dpad_up || gamepad1.dpad_down) {
-//                baseRotationMotorPower = 1;
-//
-//                baseRotationMotorDirection = gamepad1.dpad_up ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
-//            }
-//            robot.setBaseRotationMotorPosAndDirection(baseRotationMotorPower, baseRotationMotorDirection);
-
+            // Base rotation
+            if (gamepad1.dpad_up || gamepad1.dpad_down) {
+                if (gamepad1.dpad_up) {
+                    robot.setBaseRotationMotorTarget(robot.BASE_ROTATION_PLACE);
+                } else {
+                    robot.setBaseRotationMotorTarget(robot.BASE_ROTATION_PICKUP);
+                }
+            }
 
             // Move Claws
             if (gamepad1.a || gamepad1.b) {
@@ -121,6 +119,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                     robot.setLeftClawPositionAndDirection(clawPosition, Servo.Direction.REVERSE);
                 }
             }
+
             //wrist
             if (gamepad1.x || gamepad1.y) {
                 double wristPosition = gamepad1.x ? RobotHardware.WRIST_DOWN_POSITION : RobotHardware.WRIST_UP_POSITION;
@@ -128,19 +127,6 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 robot.setWristPositionAndDirection(wristPosition, wristDirection);
                 telemetry.addData("wrist", "wrist position: " + wristPosition);
             }
-
-            if (gamepad1.dpad_up || gamepad1.dpad_down) {
-
-//                DcMotorSimple.Direction dir = gamepad1.dpad_up ? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD;
-                if (gamepad1.dpad_up) {
-                    robot.setBaseRotationMotorTarget(robot.BASE_ROTATION_PLACE);
-                } else {
-                    robot.setBaseRotationMotorTarget(robot.BASE_ROTATION_PICKUP);
-                }
-            }
-//            } else {
-//                robot.setBaseRotationPower(0);
-//            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());

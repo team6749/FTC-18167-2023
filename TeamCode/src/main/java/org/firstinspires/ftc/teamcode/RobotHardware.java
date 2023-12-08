@@ -47,7 +47,7 @@ public class RobotHardware {
 
     public static final int BASE_ROTATION_PICKUP = 0;
 
-    public static final int BASE_ROTATION_PLACE = -3300;
+    public static final int BASE_ROTATION_PLACE = -3300; // TODO- make sure this is the position we want
 
     DcMotor shaftMotor = null;
     /* Declare OpMode members. */
@@ -61,7 +61,6 @@ public class RobotHardware {
 
     public static DcMotor baseRotationMotor = null;
 
-    // TODO: DEFINE ENCODER HERE
 //    private DutyCycleEncoder
 
     private Servo wrist = null;
@@ -112,7 +111,7 @@ public class RobotHardware {
 
 
         shaftMotor = myOpMode.hardwareMap.get(DcMotor.class, "shaftMotor");
-        // TODO: DEFINE ENCODER HERE
+
         //TODO: remember the SEMI-COLONS!
 
         wrist = myOpMode.hardwareMap.get(Servo.class, "wrist");
@@ -170,9 +169,9 @@ public class RobotHardware {
         baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void setBaseRotationPower(int power) {
-        baseRotationMotor.setPower(power);
-    }
+//    public void setBaseRotationPower(int power) {
+//        baseRotationMotor.setPower(power);
+//    }
 
     public int tprToDegrees(int tpr){
         return (tpr / 8192) * 360;
