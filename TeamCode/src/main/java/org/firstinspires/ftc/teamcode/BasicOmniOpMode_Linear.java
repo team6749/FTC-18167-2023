@@ -31,7 +31,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -130,12 +129,18 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 telemetry.addData("wrist", "wrist position: " + wristPosition);
             }
 
-            if (gamepad1.right_trigger > 0.5 || gamepad1.left_trigger > 0.5) {
+            if (gamepad1.dpad_up || gamepad1.dpad_down) {
 
-                DcMotorSimple.Direction dir = gamepad1.right_trigger > 0.5 ? DcMotorSimple.Direction.FORWARD: DcMotorSimple.Direction.REVERSE;
-                robot.setBaseRotationMotorPosAndDirection(dir);
-
+//                DcMotorSimple.Direction dir = gamepad1.dpad_up ? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD;
+                if (gamepad1.dpad_up) {
+                    robot.setBaseRotationMotorTarget(robot.BASE_ROTATION_PLACE);
+                } else {
+                    robot.setBaseRotationMotorTarget(robot.BASE_ROTATION_PICKUP);
+                }
             }
+//            } else {
+//                robot.setBaseRotationPower(0);
+//            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -144,7 +149,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Right Get pos", "%4.2f", RobotHardware.rightClaw.getPosition());
             telemetry.addData("Left Get pos", "%4.2f", RobotHardware.leftClaw.getPosition());
             telemetry.addData("Base Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
-            telemetry.addData("Number thing", RobotHardware.baseRotationMotor.getPower());
+            telemetry.addData("rotation speed", RobotHardware.baseRotationMotor.getPower());
             telemetry.update();
         }
     }

@@ -29,9 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.sax.StartElementListener;
-
-import com.qualcomm.hardware.motors.RevRoboticsUltraPlanetaryHdHexMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -50,8 +47,7 @@ public class RobotHardware {
 
     public static final int BASE_ROTATION_PICKUP = 0;
 
-    public static final int BASE_ROTATION_PLACE = -3900;
-
+    public static final int BASE_ROTATION_PLACE = -3300;
 
     DcMotor shaftMotor = null;
     /* Declare OpMode members. */
@@ -110,7 +106,9 @@ public class RobotHardware {
 
 
         baseRotationMotor = myOpMode.hardwareMap.get(DcMotor.class, "brm");
-        baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        baseRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        baseRotationMotor.setPower(.05);
+
 
 
         shaftMotor = myOpMode.hardwareMap.get(DcMotor.class, "shaftMotor");
@@ -164,13 +162,25 @@ public class RobotHardware {
         rightClaw.setPosition(rightClawPosition);
     }
 
-    public void setBaseRotationMotorPosAndDirection(DcMotorSimple.Direction baseRotationMotorDirection) {
-        baseRotationMotor.setDirection(baseRotationMotorDirection);
-        baseRotationMotor.setPower(0.5);
-
-        // we have identifyed that the target pos is changing and the direction is changing, but the motor is not moving to the target position
+    public void setBaseRotationMotorTarget(int targetPositionDegrees) {
+        double p = 0.0015;
+        double error = targetPositionDegrees - baseRotationMotor.getCurrentPosition();
+        double calculated = (error * p);
+        baseRotationMotor.setPower(-calculated);
+        baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    public void setBaseRotationPower(int power) {
+        baseRotationMotor.setPower(power);
+    }
+
+    public int tprToDegrees(int tpr){
+        return (tpr / 8192) * 360;
+    }
+
+    public static int degreesToTpr(int deg){
+        return (deg / 360) * 8192;
+    }
 
     /**
      * Send the two hand-servos to opposing (mirrored) positions, based on the passed offset.
