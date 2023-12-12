@@ -103,11 +103,12 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             // Base rotation
             if (gamepad1.dpad_up || gamepad1.dpad_down) {
                 if (gamepad1.dpad_up) {
-                    robot.setBaseRotationMotorTarget(robot.BASE_ROTATION_PLACE);
+                    robot.rotatioMotorSetPoint = robot.BASE_ROTATION_PLACE;
                 } else {
-                    robot.setBaseRotationMotorTarget(robot.BASE_ROTATION_PICKUP);
+                    robot.rotatioMotorSetPoint = robot.BASE_ROTATION_PICKUP;
                 }
             }
+            robot.runBaseMotorClosedLoop();
 
             // Move Claws
             if (gamepad1.a || gamepad1.b) {

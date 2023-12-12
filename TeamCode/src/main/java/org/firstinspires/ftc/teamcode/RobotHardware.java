@@ -62,6 +62,7 @@ public class RobotHardware {
     public static DcMotor baseRotationMotor = null;
 
 //    private DutyCycleEncoder
+    public double rotatioMotorSetPoint = BASE_ROTATION_PICKUP;
 
     private Servo wrist = null;
 //    public static final double HAND_SPEED      =  0.02 ;  // sets rate to move servo
@@ -159,9 +160,9 @@ public class RobotHardware {
         rightClaw.setPosition(rightClawPosition);
     }
 
-    public void setBaseRotationMotorTarget(int targetPositionDegrees) {
+    public void runBaseMotorClosedLoop() {
         double p = 0.0015;
-        double error = targetPositionDegrees - baseRotationMotor.getCurrentPosition();
+        double error = rotatioMotorSetPoint - baseRotationMotor.getCurrentPosition();
         double calculated = (error * p);
         double maxPower = 0.5;
         baseRotationMotor.setPower(Math.min(Math.max(-maxPower, -calculated), maxPower));
