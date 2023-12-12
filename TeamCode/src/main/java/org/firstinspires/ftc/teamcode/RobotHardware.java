@@ -106,8 +106,6 @@ public class RobotHardware {
 
         baseRotationMotor = myOpMode.hardwareMap.get(DcMotor.class, "brm");
         baseRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        baseRotationMotor.setPower(.05);
-
 
 
         shaftMotor = myOpMode.hardwareMap.get(DcMotor.class, "shaftMotor");
@@ -165,7 +163,8 @@ public class RobotHardware {
         double p = 0.0015;
         double error = targetPositionDegrees - baseRotationMotor.getCurrentPosition();
         double calculated = (error * p);
-        baseRotationMotor.setPower(-calculated);
+        double maxPower = 0.5;
+        baseRotationMotor.setPower(Math.min(Math.max(-maxPower, -calculated), maxPower));
         baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
