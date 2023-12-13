@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 
 public class RobotHardware {
@@ -49,7 +50,9 @@ public class RobotHardware {
 
     public static final int BASE_ROTATION_PLACE = -3300; // TODO- make sure this is the position we want
 
-    DcMotor shaftMotor = null;
+    public static DcMotor shaftMotor = null;
+
+    public static TouchSensor shaftLimitSwitch = null;
     /* Declare OpMode members. */
     private LinearOpMode myOpMode = null;   // gain access to methods in the calling OpMode.
     // Define Motor and Servo objects  (Make them private so they can't be accessed externally)
@@ -110,7 +113,7 @@ public class RobotHardware {
 
 
         shaftMotor = myOpMode.hardwareMap.get(DcMotor.class, "shaftMotor");
-
+        shaftLimitSwitch = myOpMode.hardwareMap.get(TouchSensor.class, "shaftLimitSwitch");
         //TODO: remember the SEMI-COLONS!
 
         wrist = myOpMode.hardwareMap.get(Servo.class, "wrist");
@@ -141,8 +144,13 @@ public class RobotHardware {
 
 
     public void setShaftPowerAndDirection(double shaftMotorPower, DcMotorSimple.Direction shaftDirection) {
-        shaftMotor.setDirection(shaftDirection);
-        shaftMotor.setPower(shaftMotorPower);
+        if (shaftLimitSwitch.isPressed() && shaftDirection == DcMotorSimple.Direction.FORWARD) {
+            shaftMotor.setPower(0.0);
+
+        } else {
+            shaftMotor.setDirection(shaftDirection);
+            shaftMotor.setPower(shaftMotorPower);
+        }
     }
 
     public void setWristPositionAndDirection(double wristPosition, Servo.Direction wristDirection) {
@@ -161,10 +169,11 @@ public class RobotHardware {
     }
 
     public void runBaseMotorClosedLoop() {
-        double p = 0.0015;
         double error = rotatioMotorSetPoint - baseRotationMotor.getCurrentPosition();
+        boolean goingDown = (rotatioMotorSetPoint == BASE_ROTATION_PICKUP) && baseRotationMotor.getCurrentPosition() < rotatioMotorSetPoint;
+        double p = goingDown ? 0.0006 : 0.0015;
         double calculated = (error * p);
-        double maxPower = 0.5;
+        double maxPower = goingDown ? 0.4 : 0.6;
         baseRotationMotor.setPower(Math.min(Math.max(-maxPower, -calculated), maxPower));
         baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }

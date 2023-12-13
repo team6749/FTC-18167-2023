@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -137,6 +138,8 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Left Get pos", "%4.2f", RobotHardware.leftClaw.getPosition());
             telemetry.addData("Base Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
             telemetry.addData("rotation speed", RobotHardware.baseRotationMotor.getPower());
+            telemetry.addData("Shaft power", RobotHardware.shaftMotor.getPower());
+            telemetry.addData("Limit switch state", RobotHardware.shaftLimitSwitch.isPressed());
             telemetry.update();
         }
     }
