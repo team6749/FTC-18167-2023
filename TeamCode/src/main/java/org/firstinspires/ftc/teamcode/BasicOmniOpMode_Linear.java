@@ -33,7 +33,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -104,9 +103,9 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             // Base rotation
             if (gamepad1.dpad_up || gamepad1.dpad_down) {
                 if (gamepad1.dpad_up) {
-                    robot.rotatioMotorSetPoint = robot.BASE_ROTATION_PLACE;
+                    robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
                 } else {
-                    robot.rotatioMotorSetPoint = robot.BASE_ROTATION_PICKUP;
+                    robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP;
                 }
             }
             robot.runBaseMotorClosedLoop();
@@ -127,19 +126,24 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 double wristPosition = gamepad1.x ? RobotHardware.WRIST_DOWN_POSITION : RobotHardware.WRIST_UP_POSITION;
                 Servo.Direction wristDirection = gamepad1.x ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
                 robot.setWristPositionAndDirection(wristPosition, wristDirection);
-                telemetry.addData("wrist", "wrist position: " + wristPosition);
             }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-            telemetry.addData("Right Get pos", "%4.2f", RobotHardware.rightClaw.getPosition());
-            telemetry.addData("Left Get pos", "%4.2f", RobotHardware.leftClaw.getPosition());
-            telemetry.addData("Base Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
-            telemetry.addData("rotation speed", RobotHardware.baseRotationMotor.getPower());
-            telemetry.addData("Shaft power", RobotHardware.shaftMotor.getPower());
-            telemetry.addData("Limit switch state", RobotHardware.shaftLimitSwitch.isPressed());
+            telemetry.addData("Drive Front left/right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
+            telemetry.addData("Drive Back  left/right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+
+            telemetry.addData("Right Claw Pos", "%4.2f", RobotHardware.rightClaw.getPosition());
+            telemetry.addData("Left Claw Pos", "%4.2f", RobotHardware.leftClaw.getPosition());
+
+            telemetry.addData("Wrist Position", RobotHardware.wrist.getPosition());
+
+            telemetry.addData("Base Rotation Current Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
+            telemetry.addData("Base Rotation Target Pos", RobotHardware.baseRotationMotor.getTargetPosition());
+            telemetry.addData("Base Rotation Power", RobotHardware.baseRotationMotor.getPower());
+
+            telemetry.addData("Shaft Power", RobotHardware.shaftMotor.getPower());
+            telemetry.addData("Shaft Lower Limit Pressed", RobotHardware.shaftLimitSwitch.isPressed());
             telemetry.update();
         }
     }

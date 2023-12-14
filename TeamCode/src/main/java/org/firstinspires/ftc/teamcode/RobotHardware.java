@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -46,7 +47,7 @@ public class RobotHardware {
     public static final double WRIST_DOWN_POSITION = 0;
     public static final double WRIST_UP_POSITION = 1.0;
 
-    public static final int BASE_ROTATION_PICKUP = 0;
+    public static final int BASE_ROTATION_PICKUP = -10;
 
     public static final int BASE_ROTATION_PLACE = -3300; // TODO- make sure this is the position we want
 
@@ -62,12 +63,12 @@ public class RobotHardware {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
 
-    public static DcMotor baseRotationMotor = null;
+    public static DcMotorEx baseRotationMotor = null;
 
 //    private DutyCycleEncoder
-    public double rotatioMotorSetPoint = BASE_ROTATION_PICKUP;
+    public double rotationMotorSetPoint = BASE_ROTATION_PICKUP;
 
-    private Servo wrist = null;
+    public static Servo wrist = null;
 //    public static final double HAND_SPEED      =  0.02 ;  // sets rate to move servo
 //    public static final double ARM_UP_POWER    =  0.45 ;
 //    public static final double ARM_DOWN_POWER  = -0.45 ;
@@ -108,9 +109,10 @@ public class RobotHardware {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
 
-        baseRotationMotor = myOpMode.hardwareMap.get(DcMotor.class, "brm");
+        baseRotationMotor = myOpMode.hardwareMap.get(DcMotorEx.class, "brm");
         baseRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+        // use braking to slow the motor down faster
+        baseRotationMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         shaftMotor = myOpMode.hardwareMap.get(DcMotor.class, "shaftMotor");
         shaftLimitSwitch = myOpMode.hardwareMap.get(TouchSensor.class, "shaftLimitSwitch");
@@ -169,14 +171,23 @@ public class RobotHardware {
     }
 
     public void runBaseMotorClosedLoop() {
-        double error = rotatioMotorSetPoint - baseRotationMotor.getCurrentPosition();
-        boolean goingDown = (rotatioMotorSetPoint == BASE_ROTATION_PICKUP) && baseRotationMotor.getCurrentPosition() < rotatioMotorSetPoint;
-        double p = goingDown ? 0.0006 : 0.0015;
+        double p = 0.0015;
+        double error = rotationMotorSetPoint - baseRotationMotor.getCurrentPosition();
         double calculated = (error * p);
-        double maxPower = goingDown ? 0.4 : 0.6;
+        double maxPower = 0.5;
         baseRotationMotor.setPower(Math.min(Math.max(-maxPower, -calculated), maxPower));
         baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+
+//    public void runBaseMotorClosedLoop() {
+//        double error = rotatioMotorSetPoint - baseRotationMotor.getCurrentPosition();
+//        boolean goingDown = (rotatioMotorSetPoint == BASE_ROTATION_PICKUP) && baseRotationMotor.getCurrentPosition() < rotatioMotorSetPoint;
+//        double p = goingDown ? 0.0006 : 0.0015;
+//        double calculated = (error * p);
+//        double maxPower = goingDown ? 0.4 : 0.6;
+//        baseRotationMotor.setPower(Math.min(Math.max(-maxPower, -calculated), maxPower));
+//        baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//    }
 
 //    public void setBaseRotationPower(int power) {
 //        baseRotationMotor.setPower(power);
