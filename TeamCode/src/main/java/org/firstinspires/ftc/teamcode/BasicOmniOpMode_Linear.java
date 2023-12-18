@@ -109,6 +109,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 }
             }
             robot.runBaseMotorClosedLoop();
+//            robot.runBaseMotorClosedLoopWithGravityStabilized();
 
             // Move Claws
             if (gamepad1.a || gamepad1.b) {

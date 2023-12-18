@@ -51,6 +51,12 @@ public class RobotHardware {
 
     public static final int BASE_ROTATION_PLACE = -3300; // TODO- make sure this is the position we want
 
+    //This is probably pretty close, but could be off
+    public static final int LEVEL_OFFSET = -500;
+
+    //This is just a guess, needs to be tested
+    public static final double GRAVITY_FORCE = -0.00136;
+
     public static DcMotor shaftMotor = null;
 
     public static TouchSensor shaftLimitSwitch = null;
@@ -168,6 +174,16 @@ public class RobotHardware {
     public void setRightClawPositionAndDirection(double rightClawPosition, Servo.Direction rightClawDirection) {
         rightClaw.setDirection(rightClawDirection);
         rightClaw.setPosition(rightClawPosition);
+    }
+
+    public void runBaseMotorClosedLoopWithGravityStabilized() {
+        double p = 0.0015;
+        double error = rotationMotorSetPoint - baseRotationMotor.getCurrentPosition();
+        double cosOfCurrent = Math.cos(Math.toRadians(tprToDegrees(baseRotationMotor.getCurrentPosition() + LEVEL_OFFSET)));
+        double calculated = ((cosOfCurrent * GRAVITY_FORCE) + (error * p));
+        double maxPower = 0.5;
+        baseRotationMotor.setPower(Math.min(Math.max(-maxPower, -calculated), maxPower));
+        baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void runBaseMotorClosedLoop() {
