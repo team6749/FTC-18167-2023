@@ -123,11 +123,16 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             }
 
             //wrist
-            if (gamepad1.x || gamepad1.y) {
-                double wristPosition = gamepad1.x ? RobotHardware.WRIST_DOWN_POSITION : RobotHardware.WRIST_UP_POSITION;
-                Servo.Direction wristDirection = gamepad1.x ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
+            if (gamepad1.dpad_up || gamepad1.dpad_down) {
+                double wristPosition = gamepad1.dpad_down ? RobotHardware.WRIST_DOWN_POSITION : RobotHardware.WRIST_UP_POSITION;
+                Servo.Direction wristDirection = gamepad1.dpad_down ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
                 robot.setWristPositionAndDirection(wristPosition, wristDirection);
+
             }
+//
+//            if(gamepad1.x){
+//                robot.setWristPositionAndDirection(0, Servo.Direction.FORWARD);
+//            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -138,6 +143,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Left Claw Pos", "%4.2f", RobotHardware.leftClaw.getPosition());
 
             telemetry.addData("Wrist Position", RobotHardware.wrist.getPosition());
+            telemetry.addData("Wrist Position set", "%4.2f", robot.wristStartPosition);
 
             telemetry.addData("Base Rotation Current Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
             telemetry.addData("Base Rotation Target Pos", RobotHardware.baseRotationMotor.getTargetPosition());

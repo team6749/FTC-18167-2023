@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.Thread.sleep;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -45,9 +47,9 @@ public class RobotHardware {
     public static final double CLAW_CLOSED_POSITION = 0;
 
     public static final double WRIST_DOWN_POSITION = 0;
-    public static final double WRIST_UP_POSITION = 1.0;
+    public static final double WRIST_UP_POSITION = 0.8;
 
-    public static final int BASE_ROTATION_PICKUP = -10;
+    public static final int BASE_ROTATION_PICKUP = 0;
 
     public static final int BASE_ROTATION_PLACE = -3300; // TODO- make sure this is the position we want
 
@@ -69,6 +71,7 @@ public class RobotHardware {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
 
+    public double wristStartPosition = 0;
     public static DcMotorEx baseRotationMotor = null;
 
 //    private DutyCycleEncoder
@@ -174,7 +177,7 @@ public class RobotHardware {
     public void setRightClawPositionAndDirection(double rightClawPosition, Servo.Direction rightClawDirection) {
         rightClaw.setDirection(rightClawDirection);
         rightClaw.setPosition(rightClawPosition);
-    }
+     }
 
     public void runBaseMotorClosedLoopWithGravityStabilized() {
         double p = 0.0015;
