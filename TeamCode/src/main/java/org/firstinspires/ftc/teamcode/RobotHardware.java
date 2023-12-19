@@ -47,7 +47,7 @@ public class RobotHardware {
     public static final double CLAW_CLOSED_POSITION = 0;
 
     public static final double WRIST_DOWN_POSITION = 0;
-    public static final double WRIST_UP_POSITION = 0.8;
+    public static final double WRIST_UP_POSITION = 1;
 
     public static final int BASE_ROTATION_PICKUP = 0;
 
@@ -61,7 +61,8 @@ public class RobotHardware {
 
     public static DcMotor shaftMotor = null;
 
-    public static TouchSensor shaftLimitSwitch = null;
+    public static TouchSensor lowerLimitSwitch = null;
+    public static TouchSensor upperLimitSwitch = null;
     /* Declare OpMode members. */
     private LinearOpMode myOpMode = null;   // gain access to methods in the calling OpMode.
     // Define Motor and Servo objects  (Make them private so they can't be accessed externally)
@@ -124,7 +125,8 @@ public class RobotHardware {
         baseRotationMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         shaftMotor = myOpMode.hardwareMap.get(DcMotor.class, "shaftMotor");
-        shaftLimitSwitch = myOpMode.hardwareMap.get(TouchSensor.class, "shaftLimitSwitch");
+        lowerLimitSwitch = myOpMode.hardwareMap.get(TouchSensor.class, "lowerLimitSwitch");
+        upperLimitSwitch = myOpMode.hardwareMap.get(TouchSensor.class, "upperLimitSwitch");
         //TODO: remember the SEMI-COLONS!
 
         wrist = myOpMode.hardwareMap.get(Servo.class, "wrist");
@@ -155,9 +157,13 @@ public class RobotHardware {
 
 
     public void setShaftPowerAndDirection(double shaftMotorPower, DcMotorSimple.Direction shaftDirection) {
-        if (shaftLimitSwitch.isPressed() && shaftDirection == DcMotorSimple.Direction.FORWARD) {
+        if (lowerLimitSwitch.isPressed() && shaftDirection == DcMotorSimple.Direction.FORWARD) {
             shaftMotor.setPower(0.0);
-
+        } else if(!upperLimitSwitch.isPressed() && shaftDirection == DcMotorSimple.Direction.REVERSE) {
+            shaftMotor.setPower(0.0);
+//        } else if(!upperLimitSwitch.isPressed() && !lowerLimitSwitch.isPressed()){
+//            shaftMotor.setDirection(shaftDirection);
+//            shaftMotor.setPower(shaftMotorPower);
         } else {
             shaftMotor.setDirection(shaftDirection);
             shaftMotor.setPower(shaftMotorPower);

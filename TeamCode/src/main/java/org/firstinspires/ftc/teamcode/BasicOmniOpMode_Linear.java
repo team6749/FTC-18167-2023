@@ -123,16 +123,13 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             }
 
             //wrist
-            if (gamepad1.dpad_up || gamepad1.dpad_down) {
-                double wristPosition = gamepad1.dpad_down ? RobotHardware.WRIST_DOWN_POSITION : RobotHardware.WRIST_UP_POSITION;
-                Servo.Direction wristDirection = gamepad1.dpad_down ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
+            if (gamepad1.x || gamepad1.y) {
+                double wristPosition = gamepad1.x ? RobotHardware.WRIST_DOWN_POSITION : RobotHardware.WRIST_UP_POSITION;
+                Servo.Direction wristDirection = gamepad1.x ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
                 robot.setWristPositionAndDirection(wristPosition, wristDirection);
 
             }
-//
-//            if(gamepad1.x){
-//                robot.setWristPositionAndDirection(0, Servo.Direction.FORWARD);
-//            }
+
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -150,7 +147,9 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Base Rotation Power", RobotHardware.baseRotationMotor.getPower());
 
             telemetry.addData("Shaft Power", RobotHardware.shaftMotor.getPower());
-            telemetry.addData("Shaft Lower Limit Pressed", RobotHardware.shaftLimitSwitch.isPressed());
+            telemetry.addData("Shaft Lower Limit Pressed", RobotHardware.lowerLimitSwitch.isPressed());
+            telemetry.addData("ShaftUpperLimitPressed", RobotHardware.upperLimitSwitch.isPressed());
+
             telemetry.update();
         }
     }
