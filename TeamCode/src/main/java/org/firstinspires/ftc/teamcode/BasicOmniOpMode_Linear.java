@@ -34,6 +34,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import java.util.concurrent.TimeUnit;
+
 
 
 @TeleOp(name = "Basic: Omni Linear OpMode", group = "Linear OpMode")
@@ -101,15 +103,13 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             // TODO: It makes more sense to switch base rotation and shaft movement controls (updown and leftright) Just a tought
 
             // Base rotation
-            if (gamepad1.dpad_up || gamepad1.dpad_down) {
+            if ((gamepad1.dpad_up || gamepad1.dpad_down) && !gamepad1.back) {
                 if (gamepad1.dpad_up) {
                     robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
                 } else {
                     robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP;
                 }
             }
-            robot.runBaseMotorClosedLoop();
-//            robot.runBaseMotorClosedLoopWithGravityStabilized();
 
             // Move Claws
             if (gamepad1.a || gamepad1.b) {
@@ -130,6 +130,24 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
             }
 
+            if (gamepad1.back) {
+                // setpoint rotate
+                robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_CLIMB;
+c
+//                //drive to position where we can put our arm onto the pole to score a lot of points for our team and the other team working with us so that we are happy.
+//                //make base rotation go down
+//                //TODO robot.rotationMotorSetPoint = -400;
+            }
+
+            //            robot.runBaseMotorClosedLoop();
+            if (gamepad1.back) {
+                robot.runBaseMotorClosedLoop();
+
+            } else {
+                robot.runBaseMotorClosedLoopWithGravityStabilized();
+            }
+
+
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -143,12 +161,14 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Wrist Position set", "%4.2f", robot.wristStartPosition);
 
             telemetry.addData("Base Rotation Current Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
-            telemetry.addData("Base Rotation Target Pos", RobotHardware.baseRotationMotor.getTargetPosition());
+            telemetry.addData("Base Rotation Target Pos", robot.rotationMotorSetPoint);
             telemetry.addData("Base Rotation Power", RobotHardware.baseRotationMotor.getPower());
 
             telemetry.addData("Shaft Power", RobotHardware.shaftMotor.getPower());
             telemetry.addData("Shaft Lower Limit Pressed", RobotHardware.lowerLimitSwitch.isPressed());
             telemetry.addData("ShaftUpperLimitPressed", RobotHardware.upperLimitSwitch.isPressed());
+
+            telemetry.addData("Climbing Button Pressed", gamepad1.back);
 
             telemetry.update();
         }

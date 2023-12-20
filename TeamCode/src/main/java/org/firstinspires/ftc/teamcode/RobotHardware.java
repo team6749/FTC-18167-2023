@@ -46,18 +46,24 @@ public class RobotHardware {
     public static final double CLAW_OPEN_POSITION = 1.0;
     public static final double CLAW_CLOSED_POSITION = 0;
 
+    public static final double WRIST_START_POSITION = 1;
+
     public static final double WRIST_DOWN_POSITION = 0;
-    public static final double WRIST_UP_POSITION = 1;
+
+    public static final double WRIST_UP_POSITION = .8;
 
     public static final int BASE_ROTATION_PICKUP = 0;
 
-    public static final int BASE_ROTATION_PLACE = -3300; // TODO- make sure this is the position we want
+    public static final int BASE_ROTATION_PLACE = -3300;
+
+    public static final int BASE_ROTATION_CLIMB = -2048;
+
 
     //This is probably pretty close, but could be off
     public static final int LEVEL_OFFSET = -500;
 
     //This is just a guess, needs to be tested
-    public static final double GRAVITY_FORCE = -0.00136;
+    public static final double GRAVITY_FORCE = -0.195;
 
     public static DcMotor shaftMotor = null;
 
@@ -124,6 +130,7 @@ public class RobotHardware {
         // use braking to slow the motor down faster
         baseRotationMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+
         shaftMotor = myOpMode.hardwareMap.get(DcMotor.class, "shaftMotor");
         lowerLimitSwitch = myOpMode.hardwareMap.get(TouchSensor.class, "lowerLimitSwitch");
         upperLimitSwitch = myOpMode.hardwareMap.get(TouchSensor.class, "upperLimitSwitch");
@@ -136,6 +143,19 @@ public class RobotHardware {
         myOpMode.telemetry.addData(">", "Hardware Initialized");
         myOpMode.telemetry.update();
 
+
+//        while (!myOpMode.isStopRequested()) {
+//            rotationMotorSetPoint = -500;
+////            runBaseMotorClosedLoop();
+//            runBaseMotorClosedLoopWithGravityStabilized();
+//
+//            myOpMode.telemetry.addData("Base Rotation Current Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
+//            myOpMode.telemetry.addData("Base Rotation Target Pos", RobotHardware.baseRotationMotor.getTargetPosition());
+//            myOpMode.telemetry.addData("Base Rotation Power", RobotHardware.baseRotationMotor.getPower());
+//
+//            myOpMode.telemetry.update();
+//
+//        }
     }
 
 
@@ -199,7 +219,7 @@ public class RobotHardware {
         double p = 0.0015;
         double error = rotationMotorSetPoint - baseRotationMotor.getCurrentPosition();
         double calculated = (error * p);
-        double maxPower = 0.5;
+        double maxPower = 0.35;
         baseRotationMotor.setPower(Math.min(Math.max(-maxPower, -calculated), maxPower));
         baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
