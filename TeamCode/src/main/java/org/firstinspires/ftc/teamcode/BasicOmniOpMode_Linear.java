@@ -67,10 +67,10 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower = axial + lateral + yaw;
-            double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower = axial - lateral + yaw;
-            double rightBackPower = axial + lateral - yaw;
+            double leftFrontPower = axial + lateral - yaw;
+            double rightFrontPower = axial - lateral + yaw;
+            double leftBackPower = axial - lateral - yaw;
+            double rightBackPower = axial + lateral + yaw;
 
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
@@ -133,7 +133,16 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             if (gamepad1.back) {
                 // setpoint rotate
                 robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_CLIMB;
-c
+                //make arm extend
+                while (RobotHardware.upperLimitSwitch.isPressed()) {
+                    robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
+                }
+
+//                sleep(3000); // 3 second pause
+                //pull robot up (arm considense)
+                while (!RobotHardware.lowerLimitSwitch.isPressed()) {
+                    robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
+                };
 //                //drive to position where we can put our arm onto the pole to score a lot of points for our team and the other team working with us so that we are happy.
 //                //make base rotation go down
 //                //TODO robot.rotationMotorSetPoint = -400;
