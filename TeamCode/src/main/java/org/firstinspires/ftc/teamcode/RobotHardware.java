@@ -49,9 +49,9 @@ public class RobotHardware {
 
     public static final double WRIST_START_POSITION = 1;
 
-    public static final double WRIST_DOWN_POSITION = 0;
+    public static final double WRIST_PLACE_POSITION = .5;
 
-    public static final double WRIST_UP_POSITION = .8;
+    public static final double WRIST_PICKUP_POSITION = 1;
 
     public static final int BASE_ROTATION_PICKUP = 0;
 

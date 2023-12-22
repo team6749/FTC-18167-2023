@@ -34,8 +34,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import java.util.concurrent.TimeUnit;
-
 
 
 @TeleOp(name = "Basic: Omni Linear OpMode", group = "Linear OpMode")
@@ -124,7 +122,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
             //wrist
             if (gamepad1.x || gamepad1.y) {
-                double wristPosition = gamepad1.x ? RobotHardware.WRIST_DOWN_POSITION : RobotHardware.WRIST_UP_POSITION;
+                double wristPosition = gamepad1.x ? RobotHardware.WRIST_PLACE_POSITION : RobotHardware.WRIST_PICKUP_POSITION;
                 Servo.Direction wristDirection = gamepad1.x ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
                 robot.setWristPositionAndDirection(wristPosition, wristDirection);
 
