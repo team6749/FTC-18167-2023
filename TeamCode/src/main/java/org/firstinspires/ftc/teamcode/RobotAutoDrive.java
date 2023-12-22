@@ -33,6 +33,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -138,7 +140,47 @@ public class RobotAutoDrive extends LinearOpMode
 
         if (opModeIsActive())
         {
-            robot.encoderDrive(0.7, 27, 27, 8);
+//            robot.encoderDrive(0.7, 27, 27, 8);
+//            robot.turn(90, 2);
+
+//TODO       autonomous period that hopefully works and scores many points for us
+
+            // go forward 22 in
+            robot.encoderDrive(0.7,22,22,8);
+
+            // turn left
+            robot.turn(90,3);
+
+            // base rotation up
+            robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
+            robot.runBaseMotorClosedLoopWithGravityStabilized();
+            while (RobotHardware.baseRotationMotor.getCurrentPosition() < RobotHardware.BASE_ROTATION_PLACE + 100){
+                telemetry.addData("lifting arm","%4.2f", RobotHardware.baseRotationMotor.getCurrentPosition());
+            }
+
+            // extend arm
+            while (RobotHardware.upperLimitSwitch.isPressed()) {
+                robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
+            }
+
+            // rotate wrist
+            robot.setWristPositionAndDirection(RobotHardware.WRIST_UP_POSITION, Servo.Direction.FORWARD);
+
+            // move to pixel board forward 48 in
+            robot.encoderDrive(0.5,48,48,18);
+
+            // place pixels
+            robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION,Servo.Direction.FORWARD);
+
+            sleep(500);
+
+            // stafe left
+            robot.encoderStrafe(0.5,25,25,8);
+
+            // move forward
+            robot.encoderDrive(0.3,10,10,4);
+
+
 //            targetFound = false;
 //            desiredTag  = null;
 

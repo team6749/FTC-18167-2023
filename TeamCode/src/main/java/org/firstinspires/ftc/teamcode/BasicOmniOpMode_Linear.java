@@ -179,6 +179,8 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
             telemetry.addData("Climbing Button Pressed", gamepad1.back);
 
+            telemetry.addLine("             :)");
+
             telemetry.update();
         }
     }
