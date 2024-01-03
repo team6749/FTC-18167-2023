@@ -46,6 +46,7 @@ public class RobotHardware {
     public static final double CLAW_OPEN_POSITION = 1.0;
     public static final double CLAW_CLOSED_POSITION = 0;
 
+    public static final double WRIST_UP_POSITION = 0;
     public static final double WRIST_PLACE_POSITION = .5;
 
     public static final double WRIST_PICKUP_POSITION = 1;
@@ -353,8 +354,32 @@ public class RobotHardware {
     }
 
 
-    public void turn(double degrees,
+    public void turn(double speed,
+                     double degrees,
                              double timeoutS) throws InterruptedException {
-        // TODO Implement
+        int newLeftFrontTarget;
+        int newRightFrontTarget;
+        int newLeftBackTarget;
+        int newRightBackTarget;
+
+        // degrees to inches
+        double inchesPerDegree = (20.75 * 3.14) / 360;
+
+        double inchesToRotate = degrees * inchesPerDegree;
+
+
+
+        // Ensure that the OpMode is still active
+        if (myOpMode.opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newLeftFrontTarget = leftFrontDrive.getCurrentPosition() - (int) (inchesToRotate * -1 * COUNTS_PER_INCH);
+            newRightFrontTarget = rightFrontDrive.getCurrentPosition() - (int) (inchesToRotate * COUNTS_PER_INCH);
+            newLeftBackTarget = leftBackDrive.getCurrentPosition() - (int) (inchesToRotate* -1 * COUNTS_PER_INCH);
+            newRightBackTarget = rightBackDrive.getCurrentPosition() - (int) (inchesToRotate * COUNTS_PER_INCH);
+
+            encoderMove(speed, timeoutS, newLeftFrontTarget, newRightFrontTarget, newLeftBackTarget, newRightBackTarget);
+
+        }
     }
 }

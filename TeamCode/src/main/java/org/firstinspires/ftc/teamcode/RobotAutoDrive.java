@@ -103,7 +103,7 @@ public class RobotAutoDrive extends LinearOpMode
 
     final double MAX_AUTO_SPEED = 1.0;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_STRAFE= 1.0;   //  Clip the approach speed to this max value (adjust for your robot)
-    final double MAX_AUTO_TURN  = 1.0;   //  Clip the turn speed to this max value (adjust for your robot)
+    final double MAX_AUTO_TURN  = 0.5;   //  Clip the turn speed to this max value (adjust for your robot)
 
     private DcMotor leftFrontDrive   = null;  //  Used to control the left front drive wheel
     private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
@@ -146,39 +146,48 @@ public class RobotAutoDrive extends LinearOpMode
 //TODO       autonomous period that hopefully works and scores many points for us
 
             // go forward 22 in
-            robot.encoderDrive(0.7,22,22,8);
+            robot.encoderDrive(MAX_AUTO_SPEED,22,22,8);
 
-            // turn left
-            robot.turn(90,3);
+            // turn right
+            robot.turn(MAX_AUTO_TURN, -90,3);
 
-            // base rotation up
-            robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
-            robot.runBaseMotorClosedLoopWithGravityStabilized();
-            while (RobotHardware.baseRotationMotor.getCurrentPosition() < RobotHardware.BASE_ROTATION_PLACE + 100){
-                telemetry.addData("lifting arm","%4.2f", RobotHardware.baseRotationMotor.getCurrentPosition());
-            }
+//            // base rotation up
+//            robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
+//            robot.runBaseMotorClosedLoopWithGravityStabilized();
+//            while (RobotHardware.baseRotationMotor.getCurrentPosition() < RobotHardware.BASE_ROTATION_PLACE + 100){
+//                telemetry.addData("lifting arm","%4.2f", RobotHardware.baseRotationMotor.getCurrentPosition());
+//            }
+//
+//            // extend arm
+//            while (RobotHardware.upperLimitSwitch.isPressed()) {
+//                robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
+//            }
+//
+//            // rotate wrist
+//            robot.setWristPositionAndDirection(RobotHardware.WRIST_UP_POSITION, Servo.Direction.FORWARD);
+//
+//            // move to pixel board forward 48 in
+//            robot.encoderDrive(MAX_AUTO_SPEED,48,48,18);
+//
+//            // place pixels
+//            robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION,Servo.Direction.FORWARD);
+//
+//            sleep(500);
+//
+//            // strafe left
+//            robot.encoderStrafe(MAX_AUTO_STRAFE,25,25,8);
+//
+//            // move forward
+//            robot.encoderDrive(MAX_AUTO_SPEED,10,10,4);
+//
 
-            // extend arm
-            while (RobotHardware.upperLimitSwitch.isPressed()) {
-                robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
-            }
 
-            // rotate wrist
-            robot.setWristPositionAndDirection(RobotHardware.WRIST_UP_POSITION, Servo.Direction.FORWARD);
 
-            // move to pixel board forward 48 in
-            robot.encoderDrive(0.5,48,48,18);
 
-            // place pixels
-            robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION,Servo.Direction.FORWARD);
 
-            sleep(500);
 
-            // stafe left
-            robot.encoderStrafe(0.5,25,25,8);
 
-            // move forward
-            robot.encoderDrive(0.3,10,10,4);
+
 
 
 //            targetFound = false;

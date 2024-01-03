@@ -41,7 +41,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
     RobotHardware robot = new RobotHardware(this);
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
-
+    private double startTime;
     @Override
     public void runOpMode() {
         robot.init();
@@ -128,6 +128,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
             }
 
+            // Climbing function defined below :))))
             if (gamepad1.back) {
                 // setpoint rotate
                 robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_CLIMB;
@@ -135,9 +136,13 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 while (RobotHardware.upperLimitSwitch.isPressed()) {
                     robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
                 }
-
+                // TO TEST:  sleep(3000);
+                startTime = getRuntime();
+                while (runtime.time() - startTime < 2000) {
+                    ;
+                }
                 // maybe pause or something pls
-//                sleep(3000); // 3 second pause
+
                 //pull robot up (arm considense)
                 while (!RobotHardware.lowerLimitSwitch.isPressed()) {
                     robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
