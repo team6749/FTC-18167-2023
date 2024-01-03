@@ -136,17 +136,13 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                     robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
                 }
 
+                // maybe pause or something pls
 //                sleep(3000); // 3 second pause
                 //pull robot up (arm considense)
                 while (!RobotHardware.lowerLimitSwitch.isPressed()) {
                     robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
                 };
-//                //drive to position where we can put our arm onto the pole to score a lot of points for our team and the other team working with us so that we are happy.
-//                //make base rotation go down
-//                //TODO robot.rotationMotorSetPoint = -400;
             }
-
-            //            robot.runBaseMotorClosedLoop();
             if (gamepad1.back) {
                 robot.runBaseMotorClosedLoop();
 

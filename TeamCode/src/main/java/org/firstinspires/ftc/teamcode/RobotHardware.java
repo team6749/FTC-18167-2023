@@ -43,11 +43,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class RobotHardware {
 
     // Define Drive constants.  Make them public so they CAN be used by the calling OpMode
-    public static final double MID_SERVO = 0.5;
     public static final double CLAW_OPEN_POSITION = 1.0;
     public static final double CLAW_CLOSED_POSITION = 0;
-
-    public static final double WRIST_START_POSITION = 1;
 
     public static final double WRIST_PLACE_POSITION = .5;
 
@@ -86,12 +83,8 @@ public class RobotHardware {
     public double rotationMotorSetPoint = BASE_ROTATION_PICKUP;
 
     public static Servo wrist = null;
-//    public static final double HAND_SPEED      =  0.02 ;  // sets rate to move servo
-//    public static final double ARM_UP_POWER    =  0.45 ;
-//    public static final double ARM_DOWN_POWER  = -0.45 ;
     public static Servo leftClaw = null;
     public static Servo rightClaw = null;
-
     private ElapsedTime runtime = new ElapsedTime();
     static final double     COUNTS_PER_MOTOR_REV    = 288 ;    // eg: Core Hex Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // No External Gearing.
@@ -234,19 +227,7 @@ public class RobotHardware {
         baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-//    public void runBaseMotorClosedLoop() {
-//        double error = rotatioMotorSetPoint - baseRotationMotor.getCurrentPosition();
-//        boolean goingDown = (rotatioMotorSetPoint == BASE_ROTATION_PICKUP) && baseRotationMotor.getCurrentPosition() < rotatioMotorSetPoint;
-//        double p = goingDown ? 0.0006 : 0.0015;
-//        double calculated = (error * p);
-//        double maxPower = goingDown ? 0.4 : 0.6;
-//        baseRotationMotor.setPower(Math.min(Math.max(-maxPower, -calculated), maxPower));
-//        baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//    }
 
-//    public void setBaseRotationPower(int power) {
-//        baseRotationMotor.setPower(power);
-//    }
 
     public int tprToDegrees(int tpr){
         return (tpr / 8192) * 360;
@@ -256,16 +237,6 @@ public class RobotHardware {
         return (deg / 360) * 8192;
     }
 
-    /**
-     * Send the two hand-servos to opposing (mirrored) positions, based on the passed offset.
-     *
-     * @param offset
-     */
-//    public void setHandPositions(double offset) {
-//        offset = Range.clip(offset, -0.5, 0.5);
-//        leftHand.setPosition(MID_SERVO + offset);
-//        rightHand.setPosition(MID_SERVO - offset);
-//    }
 
 
     /*
