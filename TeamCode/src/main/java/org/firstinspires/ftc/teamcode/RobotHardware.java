@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Thread.sleep;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -39,15 +40,17 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.android.AndroidSoundPool;
+
 
 public class RobotHardware {
 
     // Define Drive constants.  Make them public so they CAN be used by the calling OpMode
     public static final double CLAW_OPEN_POSITION = 1.0;
     public static final double CLAW_CLOSED_POSITION = 0;
-
+    private static AndroidSoundPool androidSoundPool;
     public static final double WRIST_UP_POSITION = 0;
-    public static final double WRIST_PLACE_POSITION = .5;
+    public static final double WRIST_PLACE_POSITION = 0;
 
     public static final double WRIST_PICKUP_POSITION = 1;
 
@@ -112,6 +115,8 @@ public class RobotHardware {
         leftBackDrive = myOpMode.hardwareMap.get(DcMotor.class, "leftback_drive");
         rightFrontDrive = myOpMode.hardwareMap.get(DcMotor.class, "rightfront_drive");
         rightBackDrive = myOpMode.hardwareMap.get(DcMotor.class, "rightback_drive");
+        androidSoundPool = new AndroidSoundPool();
+        androidSoundPool.initialize(SoundPlayer.getInstance());
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -223,7 +228,7 @@ public class RobotHardware {
         double p = 0.0015;
         double error = rotationMotorSetPoint - baseRotationMotor.getCurrentPosition();
         double calculated = (error * p);
-        double maxPower = 0.35;
+        double maxPower = 0.45;
         baseRotationMotor.setPower(Math.min(Math.max(-maxPower, -calculated), maxPower));
         baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
@@ -238,7 +243,9 @@ public class RobotHardware {
         return (deg / 360) * 8192;
     }
 
-
+    public static void darth(){
+        androidSoundPool.play("RawRes:ss_power_up");
+    }
 
     /*
      *  Method to perform a relative move, based on encoder counts.

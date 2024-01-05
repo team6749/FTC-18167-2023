@@ -29,23 +29,25 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+import org.firstinspires.ftc.robotcore.external.android.AndroidSoundPool;
 
 @TeleOp(name = "Basic: Omni Linear OpMode", group = "Linear OpMode")
 public class BasicOmniOpMode_Linear extends LinearOpMode {
     RobotHardware robot = new RobotHardware(this);
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
+    private boolean hasEndGameRun = false;
     private double startTime;
-    @Override
-    public void runOpMode() {
-        robot.init();
 
+    @Override
+    public void runOpMode() throws InterruptedException{
+        robot.init();
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
@@ -129,24 +131,43 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             }
 
             // Climbing function defined below :))))
-            if (gamepad1.back) {
+            if (gamepad1.back && !hasEndGameRun) {
                 // setpoint rotate
                 robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_CLIMB;
-                //make arm extend
-                while (RobotHardware.upperLimitSwitch.isPressed()) {
-                    robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
-                }
-                // TO TEST:  sleep(3000);
-                startTime = getRuntime();
-                while (runtime.time() - startTime < 2000) {
-                    ;
-                }
-                // maybe pause or something pls
+                // wait til brm is within plus minus 50
+                boolean isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
+                int revs = 0;
+                if(Math.abs(RobotHardware.BASE_ROTATION_CLIMB - RobotHardware.baseRotationMotor.getCurrentPosition()) < 50) {                //make arm extend
+                    while (isUpperPressed) {
+                        robot.setShaftPowerAndDirection(.7, DcMotorSimple.Direction.REVERSE);
+                        sleep(100);
+                        isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
+                        telemetry.addData("revs", revs++);
 
-                //pull robot up (arm considense)
-                while (!RobotHardware.lowerLimitSwitch.isPressed()) {
-                    robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
-                };
+                        telemetry.addData("ShaftUpperLimitPressed", isUpperPressed);
+                        telemetry.update();
+                    }
+                    robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.REVERSE);
+
+
+                    robot.darth();
+                    // worked!
+                    sleep(3000);
+                    robot.encoderDrive(.7, -10.0, -10.0, 3);
+                    robot.darth();
+
+                    // maybe pause or something pls
+                    sleep(3000);
+
+                    //pull robot up (arm considense)
+                    while (!RobotHardware.lowerLimitSwitch.isPressed()) {
+                        robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
+                    };
+                    robot.darth();
+
+                    robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.FORWARD);
+                    hasEndGameRun = true;
+                }
             }
             if (gamepad1.back) {
                 robot.runBaseMotorClosedLoop();
