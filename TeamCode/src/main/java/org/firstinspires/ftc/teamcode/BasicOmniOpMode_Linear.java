@@ -113,7 +113,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
             // Move Claws
             if (gamepad1.a || gamepad1.b) {
-                double clawPosition = gamepad1.a ? RobotHardware.CLAW_OPEN_POSITION : RobotHardware.CLAW_CLOSED_POSITION;
+                double clawPosition = gamepad1.b ? RobotHardware.CLAW_OPEN_POSITION : RobotHardware.CLAW_CLOSED_POSITION;
                 if (!gamepad1.right_bumper) {
                     robot.setRightClawPositionAndDirection(clawPosition, Servo.Direction.FORWARD);
                 }
@@ -144,7 +144,6 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                         isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
                         telemetry.addData("revs", revs++);
 
-                        telemetry.addData("ShaftUpperLimitPressed", isUpperPressed);
                         telemetry.update();
                     }
                     robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.REVERSE);
@@ -153,11 +152,11 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                     robot.darth();
                     // worked!
                     sleep(3000);
-                    robot.encoderDrive(.7, -10.0, -10.0, 3);
+                    robot.encoderDrive(.7, -16.0, -16.0, 3);
                     robot.darth();
 
                     // maybe pause or something pls
-                    sleep(3000);
+                    sleep(1000);
 
                     //pull robot up (arm considense)
                     while (!RobotHardware.lowerLimitSwitch.isPressed()) {
@@ -173,7 +172,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 robot.runBaseMotorClosedLoop();
 
             } else {
-                robot.runBaseMotorClosedLoopWithGravityStabilized();
+                robot.runClosedLoops();
             }
 
 

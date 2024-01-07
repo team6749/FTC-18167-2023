@@ -46,8 +46,8 @@ import org.firstinspires.ftc.robotcore.external.android.AndroidSoundPool;
 public class RobotHardware {
 
     // Define Drive constants.  Make them public so they CAN be used by the calling OpMode
-    public static final double CLAW_OPEN_POSITION = 1.0;
-    public static final double CLAW_CLOSED_POSITION = 0;
+    public static final double CLAW_OPEN_POSITION = 0;
+    public static final double CLAW_CLOSED_POSITION = 1.0;
     private static AndroidSoundPool androidSoundPool;
     public static final double WRIST_UP_POSITION = 0;
     public static final double WRIST_PLACE_POSITION = 0;
@@ -213,7 +213,10 @@ public class RobotHardware {
         rightClaw.setDirection(rightClawDirection);
         rightClaw.setPosition(rightClawPosition);
      }
-
+     public void runClosedLoops() {
+         runBaseMotorClosedLoopWithGravityStabilized();
+         runShaftMotorClosedLoop();
+     }
     public void runBaseMotorClosedLoopWithGravityStabilized() {
         double p = 0.0015;
         double error = rotationMotorSetPoint - baseRotationMotor.getCurrentPosition();
@@ -233,6 +236,13 @@ public class RobotHardware {
         baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    public void runShaftMotorClosedLoop() {
+        if (lowerLimitSwitch.isPressed() && shaftMotor.getDirection() == DcMotorSimple.Direction.FORWARD) {
+            shaftMotor.setPower(0.0);
+        } else if(!upperLimitSwitch.isPressed() && shaftMotor.getDirection() == DcMotorSimple.Direction.REVERSE) {
+            shaftMotor.setPower(0.0);
+        }
+    }
 
 
     public int tprToDegrees(int tpr){
@@ -357,7 +367,7 @@ public class RobotHardware {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        sleep(750);   // optional pause after each move.
+        sleep(100);   // optional pause after each move.
     }
 
 
@@ -370,7 +380,7 @@ public class RobotHardware {
         int newRightBackTarget;
 
         // degrees to inches
-        double inchesPerDegree = (20.75 * 3.14) / 360;
+        double inchesPerDegree = (20.8 * 3.14) / 360;
 
         double inchesToRotate = degrees * inchesPerDegree;
 

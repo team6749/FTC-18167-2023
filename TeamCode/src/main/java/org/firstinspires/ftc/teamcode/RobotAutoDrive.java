@@ -88,27 +88,26 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-@Autonomous(name="AutoBase", group = "Concept")
-public class RobotAutoDrive extends LinearOpMode
-{
+@Autonomous(name = "AutoBase", group = "Concept")
+public class RobotAutoDrive extends LinearOpMode {
     // Adjust these numbers to suit your robot.
     final double DESIRED_DISTANCE = 12.0; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
     //  applied to the drive motors to correct the error.
     //  Drive = Error * Gain    Make these values smaller for smoother control, or larger for a more aggressive response.
-    final double SPEED_GAIN  =  0.02  ;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
-    final double STRAFE_GAIN =  0.015 ;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
-    final double TURN_GAIN   =  0.01  ;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
+    final double SPEED_GAIN = 0.02;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
+    final double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
+    final double TURN_GAIN = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
 
-    final double MAX_AUTO_SPEED = 1.0;   //  Clip the approach speed to this max value (adjust for your robot)
-    final double MAX_AUTO_STRAFE= 1.0;   //  Clip the approach speed to this max value (adjust for your robot)
-    final double MAX_AUTO_TURN  = 0.5;   //  Clip the turn speed to this max value (adjust for your robot)
+    final double MAX_AUTO_SPEED = 0.8;   //  Clip the approach speed to this max value (adjust for your robot)
+    final double MAX_AUTO_STRAFE = 1.0;   //  Clip the approach speed to this max value (adjust for your robot)
+    final double MAX_AUTO_TURN = 0.5;   //  Clip the turn speed to this max value (adjust for your robot)
 
-    private DcMotor leftFrontDrive   = null;  //  Used to control the left front drive wheel
-    private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
-    private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
-    private DcMotor rightBackDrive   = null;  //  Used to control the right back drive wheel
+    private DcMotor leftFrontDrive = null;  //  Used to control the left front drive wheel
+    private DcMotor rightFrontDrive = null;  //  Used to control the right front drive wheel
+    private DcMotor leftBackDrive = null;  //  Used to control the left back drive wheel
+    private DcMotor rightBackDrive = null;  //  Used to control the right back drive wheel
 
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private static final int DESIRED_TAG_ID = 2;     // Choose the tag you want to approach or set to -1 for ANY tag.
@@ -118,12 +117,13 @@ public class RobotAutoDrive extends LinearOpMode
 
     RobotHardware robot = new RobotHardware(this);
 
-    @Override public void runOpMode() throws InterruptedException {
+    @Override
+    public void runOpMode() throws InterruptedException {
         robot.init();
 //        boolean targetFound     = false;    // Set to true when an AprilTag target is detected
-        double  drive           = 0;        // Desired forward power/speed (-1 to +1)
-        double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
-        double  turn            = 0;        // Desired turning power/speed (-1 to +1)
+        double drive = 0;        // Desired forward power/speed (-1 to +1)
+        double strafe = 0;        // Desired strafe power/speed (-1 to +1)
+        double turn = 0;        // Desired turning power/speed (-1 to +1)
 
         // Initialize the Apriltag Detection process
 //        initAprilTag();
@@ -138,18 +138,77 @@ public class RobotAutoDrive extends LinearOpMode
         telemetry.update();
         waitForStart();
 
-        if (opModeIsActive())
-        {
-//            robot.encoderDrive(0.7, 27, 27, 8);
+        if (opModeIsActive()) {
+            autoDrive(true, 2);
+        }
+    }
+
+    private void autoDrive(boolean blueTeam, int spikePos) throws InterruptedException {
+        //            robot.encoderDrive(0.7, 27, 27, 8);
 //            robot.turn(90, 2);
 
 //TODO       autonomous period that hopefully works and scores many points for us
 
-            // go forward 22 in
-            robot.encoderDrive(MAX_AUTO_SPEED,22,22,8);
+        // go forward 22 in
+//        robot.encoderDrive(MAX_AUTO_SPEED,22,22,8);
+//
+//        if (spikePos == 1) {
+//            // turn right
+//            robot.turn(MAX_AUTO_TURN, -90, 3);
+//            robot.turn(MAX_AUTO_TURN, -60, 3);
+//        } else if (spikePos == 2) {
+//            // turn right
+//            robot.turn(MAX_AUTO_TURN, -90, 3);
+//            robot.turn(MAX_AUTO_TURN, -90, 3);
+//        } else {
+//            // turn right
+//            robot.turn(MAX_AUTO_TURN, 90, 3);
+//            robot.turn(MAX_AUTO_TURN, 60, 3);
+//        }
+        // base rotation up
+        robot.rotationMotorSetPoint = -600;
+        robot.runClosedLoops();
+        while (RobotHardware.baseRotationMotor.getCurrentPosition() > -500 && opModeIsActive()) {
+            robot.runClosedLoops();
+            telemetry.addData("lifting arm", RobotHardware.baseRotationMotor.getCurrentPosition());
+        }
+//         rotate wrist
+        robot.setWristPositionAndDirection(RobotHardware.WRIST_PICKUP_POSITION, Servo.Direction.FORWARD);
 
-            // turn right
-            robot.turn(MAX_AUTO_TURN, -90,3);
+        // extend arm
+        boolean isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
+        int revs = 0;
+
+        while (isUpperPressed && opModeIsActive()) {
+            robot.runClosedLoops();
+            robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
+            sleep(50);
+            isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
+            telemetry.addData("revs", revs++);
+            telemetry.update();
+        }
+        robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.REVERSE);
+
+
+            // base rotation down
+        robot.rotationMotorSetPoint = -150;
+        robot.runBaseMotorClosedLoopWithGravityStabilized();
+        while (RobotHardware.baseRotationMotor.getCurrentPosition() < -200){
+            robot.runClosedLoops();
+            telemetry.addData("dropping arm", RobotHardware.baseRotationMotor.getCurrentPosition());
+        }
+
+        // place pixel
+        robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
+        telemetry.addData("Right Claw Pos", "%4.2f", RobotHardware.rightClaw.getPosition());
+        telemetry.update();
+
+        while (opModeIsActive()) {
+            robot.runClosedLoops();
+
+        }
+// ----------------
+
 
 //            // base rotation up
 //            robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
@@ -182,14 +241,6 @@ public class RobotAutoDrive extends LinearOpMode
 //
 
 
-
-
-
-
-
-
-
-
 //            targetFound = false;
 //            desiredTag  = null;
 
@@ -214,7 +265,7 @@ public class RobotAutoDrive extends LinearOpMode
 //                }
 //            }
 
-            // Tell the driver what we see, and what to do.
+        // Tell the driver what we see, and what to do.
 //            if (targetFound) {
 //                telemetry.addData("\n>","HOLD Left-Bumper to Drive to Target\n");
 //                telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
@@ -252,7 +303,6 @@ public class RobotAutoDrive extends LinearOpMode
 //            // Apply desired axes motions to the drivetrain.
 //            moveRobot(drive, strafe, turn);
 //            sleep(10);
-        }
     }
 
     /**
@@ -266,10 +316,10 @@ public class RobotAutoDrive extends LinearOpMode
      */
     public void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.
-        double leftFrontPower    =  x -y -yaw;
-        double rightFrontPower   =  x +y +yaw;
-        double leftBackPower     =  x +y -yaw;
-        double rightBackPower    =  x -y +yaw;
+        double leftFrontPower = x - y - yaw;
+        double rightFrontPower = x + y + yaw;
+        double leftBackPower = x + y - yaw;
+        double rightBackPower = x - y + yaw;
 
         // Normalize wheel powers to be less than 1.0
         double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
@@ -320,7 +370,7 @@ public class RobotAutoDrive extends LinearOpMode
      Manually set the camera gain and exposure.
      This can only be called AFTER calling initAprilTag(), and only works for Webcams;
     */
-    private void    setManualExposure(int exposureMS, int gain) {
+    private void setManualExposure(int exposureMS, int gain) {
         // Wait for the camera to be open, then use the controls
 
         if (visionPortal == null) {
@@ -339,21 +389,19 @@ public class RobotAutoDrive extends LinearOpMode
         }
 
         // Set camera controls unless we are stopping.
-        if (!isStopRequested())
-        {
+        if (!isStopRequested()) {
             ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
             if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
                 exposureControl.setMode(ExposureControl.Mode.Manual);
                 sleep(50);
             }
-            exposureControl.setExposure((long)exposureMS, TimeUnit.MILLISECONDS);
+            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
             sleep(20);
             GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
             gainControl.setGain(gain);
             sleep(20);
         }
     }
-
 
 
 }
