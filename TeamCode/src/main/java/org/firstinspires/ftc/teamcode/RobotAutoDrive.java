@@ -139,7 +139,7 @@ public class RobotAutoDrive extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            autoDrive(true, 2);
+            autoDrive(true, 3);
         }
     }
 
@@ -150,25 +150,25 @@ public class RobotAutoDrive extends LinearOpMode {
 //TODO       autonomous period that hopefully works and scores many points for us
 
         // go forward 22 in
-//        robot.encoderDrive(MAX_AUTO_SPEED,22,22,8);
-//
-//        if (spikePos == 1) {
-//            // turn right
-//            robot.turn(MAX_AUTO_TURN, -90, 3);
-//            robot.turn(MAX_AUTO_TURN, -60, 3);
-//        } else if (spikePos == 2) {
-//            // turn right
-//            robot.turn(MAX_AUTO_TURN, -90, 3);
-//            robot.turn(MAX_AUTO_TURN, -90, 3);
-//        } else {
-//            // turn right
-//            robot.turn(MAX_AUTO_TURN, 90, 3);
-//            robot.turn(MAX_AUTO_TURN, 60, 3);
-//        }
+        robot.encoderDrive(MAX_AUTO_SPEED,22,22,8);
+
+        if (spikePos == 1) {
+            // turn right
+            robot.turn(MAX_AUTO_TURN, -90, 3);
+            robot.turn(MAX_AUTO_TURN, -60, 3);
+        } else if (spikePos == 2) {
+            // turn right
+            robot.turn(MAX_AUTO_TURN, -90, 3);
+            robot.turn(MAX_AUTO_TURN, -90, 3);
+        } else {
+            // turn left
+            robot.turn(MAX_AUTO_TURN, 90, 3);
+            robot.turn(MAX_AUTO_TURN, 60, 3);
+        }
         // base rotation up
-        robot.rotationMotorSetPoint = -600;
+        robot.rotationMotorSetPoint = -400;
         robot.runClosedLoops();
-        while (RobotHardware.baseRotationMotor.getCurrentPosition() > -500 && opModeIsActive()) {
+        while (RobotHardware.baseRotationMotor.getCurrentPosition() > -300 && opModeIsActive()) {
             robot.runClosedLoops();
             telemetry.addData("lifting arm", RobotHardware.baseRotationMotor.getCurrentPosition());
         }
@@ -203,12 +203,48 @@ public class RobotAutoDrive extends LinearOpMode {
         telemetry.addData("Right Claw Pos", "%4.2f", RobotHardware.rightClaw.getPosition());
         telemetry.update();
 
+        sleep(300);
+
+// ----------------
+        // base rotation up
+        robot.rotationMotorSetPoint = -400;
+        robot.runClosedLoops();
+        while (RobotHardware.baseRotationMotor.getCurrentPosition() > -300 && opModeIsActive()) {
+            robot.runClosedLoops();
+            telemetry.addData("lifting arm", RobotHardware.baseRotationMotor.getCurrentPosition());
+        }
+
+        // de-extend arm
+        boolean isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
+        revs = 0;
+
+        while (!isLowerPressed && opModeIsActive()) {
+            robot.runClosedLoops();
+            robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
+            sleep(50);
+            isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
+            telemetry.addData("revs", revs++);
+            telemetry.update();
+        }
+        robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.FORWARD);
+
+        if (spikePos == 1) {
+            // turn left
+            robot.turn(MAX_AUTO_TURN, -90, 3);
+            robot.turn(MAX_AUTO_TURN, -30, 3);
+        } else if (spikePos == 2) {
+            // turn right
+            robot.turn(MAX_AUTO_TURN, -90, 3);
+        } else {
+            // turn right
+            robot.turn(MAX_AUTO_TURN, -60, 3);
+        }
+
+
         while (opModeIsActive()) {
             robot.runClosedLoops();
 
         }
-// ----------------
-
 
 //            // base rotation up
 //            robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
