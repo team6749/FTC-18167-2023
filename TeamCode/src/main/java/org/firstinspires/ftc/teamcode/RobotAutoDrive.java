@@ -139,7 +139,7 @@ public class RobotAutoDrive extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            autoDrive(true, 3);
+            autoDrive(false, 3);
         }
     }
 
@@ -228,16 +228,30 @@ public class RobotAutoDrive extends LinearOpMode {
         }
         robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.FORWARD);
 
-        if (spikePos == 1) {
-            // turn left
-            robot.turn(MAX_AUTO_TURN, -90, 3);
-            robot.turn(MAX_AUTO_TURN, -30, 3);
-        } else if (spikePos == 2) {
-            // turn right
-            robot.turn(MAX_AUTO_TURN, -90, 3);
+        if (blueTeam) {
+            if (spikePos == 1) {
+                // turn left
+                robot.turn(MAX_AUTO_TURN, -90, 3);
+                robot.turn(MAX_AUTO_TURN, -30, 3);
+            } else if (spikePos == 2) {
+                // turn right
+                robot.turn(MAX_AUTO_TURN, -90, 3);
+            } else {
+                // turn right
+                robot.turn(MAX_AUTO_TURN, -60, 3);
+            }
         } else {
-            // turn right
-            robot.turn(MAX_AUTO_TURN, -60, 3);
+            if (spikePos == 3) {
+                // turn left
+                robot.turn(MAX_AUTO_TURN, 90, 3);
+                robot.turn(MAX_AUTO_TURN, 30, 3);
+            } else if (spikePos == 2) {
+                // turn right
+                robot.turn(MAX_AUTO_TURN, 90, 3);
+            } else {
+                // turn right
+                robot.turn(MAX_AUTO_TURN, 60, 3);
+            }
         }
 
 
@@ -275,6 +289,7 @@ public class RobotAutoDrive extends LinearOpMode {
 //            // move forward
 //            robot.encoderDrive(MAX_AUTO_SPEED,10,10,4);
 //
+
 
 
 //            targetFound = false;
