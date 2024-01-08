@@ -88,8 +88,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-@Autonomous(name = "AutoBase", group = "Concept")
-public class RobotAutoDrive extends LinearOpMode {
+public abstract class RobotAutoDrive extends LinearOpMode {
     // Adjust these numbers to suit your robot.
     final double DESIRED_DISTANCE = 12.0; //  this is how close the camera should get to the target (inches)
 
@@ -117,8 +116,7 @@ public class RobotAutoDrive extends LinearOpMode {
 
     RobotHardware robot = new RobotHardware(this);
 
-    @Override
-    public void runOpMode() throws InterruptedException {
+    public void initBase() throws InterruptedException {
         robot.init();
 //        boolean targetFound     = false;    // Set to true when an AprilTag target is detected
         double drive = 0;        // Desired forward power/speed (-1 to +1)
@@ -138,12 +136,9 @@ public class RobotAutoDrive extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
-        if (opModeIsActive()) {
-            autoDrive(false, 3);
-        }
     }
 
-    private void autoDrive(boolean blueTeam, int spikePos) throws InterruptedException {
+    protected void autoDrive(boolean blueTeam, int spikePos) throws InterruptedException {
         //            robot.encoderDrive(0.7, 27, 27, 8);
 //            robot.turn(90, 2);
 

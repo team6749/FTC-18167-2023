@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="autoTest")
+//@Autonomous(name="autoTest")
 public class Tutorial extends OpMode {
 
     private ElapsedTime     runtime = new ElapsedTime();
