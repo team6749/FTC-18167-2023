@@ -33,7 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 
 @Autonomous(name = "Blue-1Backstage", group = "Autonomous")
-public class RobotAutoDriveBlue1Backstage extends RobotAutoDrive {
+public class RobotAutoDriveBlue1Backstage extends RobotAutoDrive {;
 
 
     @Override
@@ -47,3 +47,4 @@ public class RobotAutoDriveBlue1Backstage extends RobotAutoDrive {
 
 
 }
+

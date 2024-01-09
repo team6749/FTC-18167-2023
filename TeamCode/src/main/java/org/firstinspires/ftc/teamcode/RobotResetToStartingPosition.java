@@ -149,7 +149,13 @@ public class RobotResetToStartingPosition extends LinearOpMode {
             telemetry.addData("dropping arm", RobotHardware.baseRotationMotor.getCurrentPosition());
         }
         sleep(100);
-        
+
+        // place pixel
+        robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.REVERSE);
+        robot.setLeftClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
+
+        sleep(3000);
+
         // place pixel
         robot.setRightClawPositionAndDirection(RobotHardware.CLAW_CLOSED_POSITION, Servo.Direction.FORWARD);
         robot.setLeftClawPositionAndDirection(RobotHardware.CLAW_CLOSED_POSITION, Servo.Direction.REVERSE);

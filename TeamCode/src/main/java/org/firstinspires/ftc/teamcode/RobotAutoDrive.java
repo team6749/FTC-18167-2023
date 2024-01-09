@@ -90,7 +90,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class RobotAutoDrive extends LinearOpMode {
     // Adjust these numbers to suit your robot.
-    final double DESIRED_DISTANCE = 12.0; //  this is how close the camera should get to the target (inches)
+    final double DESIRED_DISTANCE = 4.0; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
     //  applied to the drive motors to correct the error.
@@ -141,6 +141,10 @@ public abstract class RobotAutoDrive extends LinearOpMode {
     protected void autoDrive(boolean blueTeam, boolean isBackStage, int spikePos) throws InterruptedException {
 
 //TODO       autonomous period that hopefully works and scores many points for us
+
+        //close claws
+        robot.setRightClawPositionAndDirection(1, Servo.Direction.FORWARD);
+        robot.setLeftClawPositionAndDirection(1, Servo.Direction.REVERSE);
 
         // go forward 22 in
         robot.encoderDrive(MAX_AUTO_SPEED,22,22,8);
@@ -254,6 +258,8 @@ public abstract class RobotAutoDrive extends LinearOpMode {
                 // turn right
                 robot.turn(MAX_AUTO_TURN, -60, 3);
             }
+            //strafe right
+            robot.encoderStrafe(1,-2,-2,1);
         } else {
             if (spikePos == 3) {
                 // turn left
@@ -266,14 +272,15 @@ public abstract class RobotAutoDrive extends LinearOpMode {
                 // turn right
                 robot.turn(MAX_AUTO_TURN, 60, 3);
             }
+            //strafe left
+            robot.encoderStrafe(1,2,2,1);
         }
-
-        //strafe right
-        robot.encoderStrafe(1,-2,-2,1);
 
         //if not backstage, drive forward
         if (isBackStage == false) {
-            robot.encoderDrive(MAX_AUTO_SPEED, 25, 25, 5);
+            robot.encoderDrive(MAX_AUTO_SPEED, 40, 40, 5);
+        } else {
+            robot.encoderDrive(MAX_AUTO_SPEED, 10, 0, 5);
         }
 
 
@@ -529,7 +536,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
             }
         }
 
-        if (targetFound) {
+        if (targetFound && desiredTag != null) {
 
             // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
             double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
@@ -542,10 +549,11 @@ public abstract class RobotAutoDrive extends LinearOpMode {
             strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
 
             telemetry.addData("Auto","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+            telemetry.update();
             moveRobot(drive, strafe, turn);
             sleep(10);
         }
-        boolean positionCompleted = drive + strafe + turn == 0;
+        boolean positionCompleted = false;//drive + strafe + turn  0;
         return positionCompleted;
     }
 
