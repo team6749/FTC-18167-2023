@@ -99,9 +99,9 @@ public abstract class RobotAutoDrive extends LinearOpMode {
     final double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
     final double TURN_GAIN = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
 
-    final double MAX_AUTO_SPEED = 0.8;   //  Clip the approach speed to this max value (adjust for your robot)
+    final double MAX_AUTO_SPEED = 1.0;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_STRAFE = 1.0;   //  Clip the approach speed to this max value (adjust for your robot)
-    final double MAX_AUTO_TURN = 0.5;   //  Clip the turn speed to this max value (adjust for your robot)
+    final double MAX_AUTO_TURN = 0.8;   //  Clip the turn speed to this max value (adjust for your robot)
 
     private DcMotor leftFrontDrive = null;  //  Used to control the left front drive wheel
     private DcMotor rightFrontDrive = null;  //  Used to control the right front drive wheel
@@ -139,8 +139,6 @@ public abstract class RobotAutoDrive extends LinearOpMode {
     }
 
     protected void autoDrive(boolean blueTeam, boolean isBackStage, int spikePos) throws InterruptedException {
-        //            robot.encoderDrive(0.7, 27, 27, 8);
-//            robot.turn(90, 2);
 
 //TODO       autonomous period that hopefully works and scores many points for us
 

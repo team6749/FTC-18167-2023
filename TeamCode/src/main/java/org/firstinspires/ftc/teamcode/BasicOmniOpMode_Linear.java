@@ -105,9 +105,25 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             // Base rotation
             if ((gamepad1.dpad_up || gamepad1.dpad_down) && !gamepad1.back) {
                 if (gamepad1.dpad_up) {
-                    robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
+                    if (robot.baseRotationMotor.getCurrentPosition() > RobotHardware.BASE_ROTATION_PLACE + 200) {
+                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE + 300;
+                    } else if (robot.baseRotationMotor.getCurrentPosition() > RobotHardware.BASE_ROTATION_PLACE + 300) {
+                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE + 400;
+                    } else if (robot.baseRotationMotor.getCurrentPosition() > RobotHardware.BASE_ROTATION_PLACE + 400) {
+                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE + 500;
+                    } else {
+                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
+                    }
                 } else {
-                    robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP;
+                    if (robot.baseRotationMotor.getCurrentPosition() < RobotHardware.BASE_ROTATION_PICKUP -500) {
+                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP - 400;
+                    } else if (robot.baseRotationMotor.getCurrentPosition() < RobotHardware.BASE_ROTATION_PICKUP - 400) {
+                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP - 300;
+                    } else if (robot.baseRotationMotor.getCurrentPosition() < RobotHardware.BASE_ROTATION_PICKUP - 300) {
+                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP - 200;
+                    } else {
+                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP;
+                    }
                 }
             }
 
