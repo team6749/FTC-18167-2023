@@ -305,10 +305,10 @@ public class RobotHardware {
         if (myOpMode.opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newLeftFrontTarget = leftFrontDrive.getCurrentPosition() - (int) (frontInches * COUNTS_PER_INCH);
+            newLeftFrontTarget = leftFrontDrive.getCurrentPosition() + (int) (frontInches * COUNTS_PER_INCH);
             newRightFrontTarget = rightFrontDrive.getCurrentPosition() - (int) (frontInches * COUNTS_PER_INCH);
             newLeftBackTarget = leftBackDrive.getCurrentPosition() - (int) (backInches * COUNTS_PER_INCH);
-            newRightBackTarget = rightBackDrive.getCurrentPosition() - (int) (backInches * COUNTS_PER_INCH);
+            newRightBackTarget = rightBackDrive.getCurrentPosition() + (int) (backInches * COUNTS_PER_INCH);
 
             encoderMove(speed, timeoutS, newLeftFrontTarget, newRightFrontTarget, newLeftBackTarget, newRightBackTarget);
 

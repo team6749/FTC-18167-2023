@@ -109,11 +109,11 @@ public abstract class RobotAutoDrive extends LinearOpMode {
     private DcMotor rightBackDrive = null;  //  Used to control the right back drive wheel
 
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
-    private static final int DESIRED_TAG_ID = 2;     // Choose the tag you want to approach or set to -1 for ANY tag.
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
     private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
 
+    private boolean targetFound = false;
     RobotHardware robot = new RobotHardware(this);
 
     public void initBase() throws InterruptedException {
@@ -124,7 +124,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         double turn = 0;        // Desired turning power/speed (-1 to +1)
 
         // Initialize the Apriltag Detection process
-//        initAprilTag();
+        initAprilTag();
 
 
         if (USE_WEBCAM)
@@ -138,7 +138,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
     }
 
-    protected void autoDrive(boolean blueTeam, int spikePos) throws InterruptedException {
+    protected void autoDrive(boolean blueTeam, boolean isBackStage, int spikePos) throws InterruptedException {
         //            robot.encoderDrive(0.7, 27, 27, 8);
 //            robot.turn(90, 2);
 
@@ -185,13 +185,34 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.REVERSE);
 
 
+        // base rotation down
+        robot.rotationMotorSetPoint = -300;
+        while (RobotHardware.baseRotationMotor.getCurrentPosition() < -350){
+            robot.runClosedLoops();
+            telemetry.addData("dropping arm to -300", RobotHardware.baseRotationMotor.getCurrentPosition());
+            telemetry.update();
+
+        }
+        sleep(50);
+
+        // base rotation down
+        robot.rotationMotorSetPoint = -200;
+        while (RobotHardware.baseRotationMotor.getCurrentPosition() < -250){
+            robot.runClosedLoops();
+            telemetry.addData("dropping arm to -200", RobotHardware.baseRotationMotor.getCurrentPosition());
+            telemetry.update();
+
+        }
+        sleep(50);
+
             // base rotation down
-        robot.rotationMotorSetPoint = -150;
-        robot.runBaseMotorClosedLoopWithGravityStabilized();
+        robot.rotationMotorSetPoint = -120;
         while (RobotHardware.baseRotationMotor.getCurrentPosition() < -200){
             robot.runClosedLoops();
-            telemetry.addData("dropping arm", RobotHardware.baseRotationMotor.getCurrentPosition());
+            telemetry.addData("dropping arm to -150", RobotHardware.baseRotationMotor.getCurrentPosition());
+            telemetry.update();
         }
+        sleep(50);
 
         // place pixel
         robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
@@ -248,6 +269,37 @@ public abstract class RobotAutoDrive extends LinearOpMode {
                 robot.turn(MAX_AUTO_TURN, 60, 3);
             }
         }
+
+        //strafe right
+        robot.encoderStrafe(1,-2,-2,1);
+
+        //if not backstage, drive forward
+        if (isBackStage == false) {
+            robot.encoderDrive(MAX_AUTO_SPEED, 25, 25, 5);
+        }
+
+
+        boolean aprilTagMoveCompleted = false;
+        while (opModeIsActive() && !aprilTagMoveCompleted ) {
+            aprilTagMoveCompleted = driveToAprilTag(blueTeam, spikePos);
+            robot.runClosedLoops();
+            telemetry.addData("AprilTagCompleted", aprilTagMoveCompleted);
+            telemetry.update();
+        }
+
+        if (targetFound) {
+
+            // Lift Arm
+
+            // flip wrist
+
+            // Extend Arm
+            // drop pixel
+
+
+
+        }
+
 
 
         while (opModeIsActive()) {
@@ -449,5 +501,54 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         }
     }
 
+    public boolean driveToAprilTag (boolean blueTeam,int spikePos) {
+
+        int desiredTagId = spikePos + (blueTeam ? 0 : 3);
+
+        desiredTag  = null;
+        double  drive           = 0;        // Desired forward power/speed (-1 to +1)
+        double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
+        double  turn            = 0;
+
+        // Step through the list of detected tags and look for a matching tag
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            // Look to see if we have size info on this tag.
+            if (detection.metadata != null) {
+                //  Check to see if we want to track towards this tag.
+                if (detection.id == desiredTagId) {
+                    // Yes, we want to use this tag.
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                } else {
+                    // This tag is in the library, but we do not want to track it right now.
+                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                }
+            } else {
+                // This tag is NOT in the library, so we don't have enough information to track to it.
+                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+            }
+        }
+
+        if (targetFound) {
+
+            // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
+            double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
+            double  headingError    = desiredTag.ftcPose.bearing;
+            double  yawError        = desiredTag.ftcPose.yaw;
+
+            // Use the speed and turn "gains" to calculate how we want the robot to move.
+            drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+            turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
+            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+            telemetry.addData("Auto","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+            moveRobot(drive, strafe, turn);
+            sleep(10);
+        }
+        boolean positionCompleted = drive + strafe + turn == 0;
+        return positionCompleted;
+    }
 
 }

@@ -41,7 +41,7 @@ public class RobotAutoDriveBlue2 extends RobotAutoDrive {
         super.initBase();
 
         if (opModeIsActive()) {
-            autoDrive(true, 2);
+            autoDrive(true,false, 2);
         }
     }
 
