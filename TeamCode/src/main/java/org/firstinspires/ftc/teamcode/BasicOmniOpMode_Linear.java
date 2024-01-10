@@ -93,67 +93,41 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             DcMotorSimple.Direction shaftDirection = DcMotorSimple.Direction.FORWARD;
 
             // shaft - move arm up/down
-            if (gamepad1.dpad_right || gamepad1.dpad_left) {
+            if (gamepad1.dpad_right || gamepad1.dpad_left || gamepad2.dpad_right || gamepad2.dpad_left) {
                 shaftMotorPower = 1;
 
-                shaftDirection = gamepad1.dpad_right ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+                shaftDirection = gamepad1.dpad_right || gamepad2.dpad_right ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
             }
             robot.setShaftPowerAndDirection(shaftMotorPower, shaftDirection);
 
             // TODO: It makes more sense to switch base rotation and shaft movement controls (updown and leftright) Just a tought
 
             // Base rotation
-            if ((gamepad1.dpad_up || gamepad1.dpad_down) && !gamepad1.back) {
+            if ((gamepad1.dpad_up || gamepad1.dpad_down ||
+                    gamepad2.dpad_up || gamepad2.dpad_down) && !gamepad1.back) {
                 if (gamepad1.dpad_up) {
-                    if (robot.baseRotationMotor.getCurrentPosition() - 300 > RobotHardware.BASE_ROTATION_PLACE) {
-                        robot.rotationMotorSetPoint = robot.baseRotationMotor.getCurrentPosition() - 300;
-                    } else {
-                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
-                    }
-//                    if (robot.baseRotationMotor.getCurrentPosition() > RobotHardware.BASE_ROTATION_PLACE + 200) {
-//                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE + 300;
-//                    } else if (robot.baseRotationMotor.getCurrentPosition() > RobotHardware.BASE_ROTATION_PLACE + 300) {
-//                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE + 400;
-//                    } else if (robot.baseRotationMotor.getCurrentPosition() > RobotHardware.BASE_ROTATION_PLACE + 400) {
-//                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE + 500;
-//                    } else {
-//                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
-//                    }
+                    robot.liftPixelForPlacement();
                 } else {
-                    if (robot.baseRotationMotor.getCurrentPosition() + 300 < RobotHardware.BASE_ROTATION_PICKUP) {
-                        robot.rotationMotorSetPoint = robot.baseRotationMotor.getCurrentPosition() + 300;
-                    } else {
-                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP;
-                    }
-
-//                    if (robot.baseRotationMotor.getCurrentPosition() < RobotHardware.BASE_ROTATION_PICKUP -500) {
-//                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP - 400;
-//                    } else if (robot.baseRotationMotor.getCurrentPosition() < RobotHardware.BASE_ROTATION_PICKUP - 400) {
-//                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP - 300;
-//                    } else if (robot.baseRotationMotor.getCurrentPosition() < RobotHardware.BASE_ROTATION_PICKUP - 300) {
-//                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP - 200;
-//                    } else {
-//                        robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PICKUP;
-//                    }
+                    robot.dropArmForPixelPickup();
                 }
                 sleep(10);
             }
 
             // Move Claws
-            if (gamepad1.a || gamepad1.b) {
-                double clawPosition = gamepad1.b ? RobotHardware.CLAW_OPEN_POSITION : RobotHardware.CLAW_CLOSED_POSITION;
-                if (!gamepad1.right_bumper) {
+            if (gamepad1.a || gamepad1.b || gamepad2.a || gamepad2.b) {
+                double clawPosition = gamepad1.b || gamepad2.b ? RobotHardware.CLAW_OPEN_POSITION : RobotHardware.CLAW_CLOSED_POSITION;
+                if (!gamepad1.right_bumper || gamepad2.right_bumper) {
                     robot.setRightClawPositionAndDirection(clawPosition, Servo.Direction.FORWARD);
                 }
-                if (!gamepad1.left_bumper) {
+                if (!gamepad1.left_bumper || gamepad2.left_bumper) {
                     robot.setLeftClawPositionAndDirection(clawPosition, Servo.Direction.REVERSE);
                 }
             }
 
             //wrist
-            if (gamepad1.x || gamepad1.y) {
-                double wristPosition = gamepad1.x ? RobotHardware.WRIST_PLACE_POSITION : RobotHardware.WRIST_PICKUP_POSITION;
-                Servo.Direction wristDirection = gamepad1.x ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
+            if (gamepad1.x || gamepad1.y || gamepad2.x || gamepad2.y) {
+                double wristPosition = gamepad1.x || gamepad2.x ? RobotHardware.WRIST_PLACE_POSITION : RobotHardware.WRIST_PICKUP_POSITION;
+                Servo.Direction wristDirection = gamepad1.x || gamepad2.x ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
                 robot.setWristPositionAndDirection(wristPosition, wristDirection);
 
             }
@@ -166,43 +140,36 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 boolean isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
                 int revs = 0;
                 if(Math.abs(RobotHardware.BASE_ROTATION_CLIMB - RobotHardware.baseRotationMotor.getCurrentPosition()) < 50) {                //make arm extend
-                    while (isUpperPressed) {
-                        robot.setShaftPowerAndDirection(.7, DcMotorSimple.Direction.REVERSE);
-                        sleep(100);
-                        isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
-                        telemetry.addData("revs", revs++);
-
-                        telemetry.update();
-                    }
-                    robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.REVERSE);
+                   robot.extendArm();
 
 
                     robot.darth();
                     // worked!
-                    sleep(3000);
+                    sleep(200);
                     robot.encoderDrive(.7, -16.0, -16.0, 3);
                     robot.darth();
 
                     // maybe pause or something pls
-                    sleep(1000);
+                    sleep(200);
 
                     //pull robot up (arm considense)
-                    while (!RobotHardware.lowerLimitSwitch.isPressed()) {
-                        robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
-                    };
+                    robot.detractArm();
                     robot.darth();
 
-                    robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.FORWARD);
                     hasEndGameRun = true;
                 }
             }
             if (gamepad1.back) {
-                robot.runBaseMotorClosedLoop();
+                robot.runClosedLoops();
+                robot.raiseOrLowerArm(-2000,100);
 
             } else {
                 robot.runClosedLoops();
             }
 
+            if (gamepad1.left_stick_button == true) {
+                robot.raiseOrLowerArm(-400,100);
+            }
 
 
             // Show the elapsed game time and wheel power.
@@ -231,4 +198,5 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.update();
         }
     }
+
 }

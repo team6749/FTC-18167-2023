@@ -29,8 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import static java.lang.Thread.sleep;
-
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -213,6 +211,24 @@ public class RobotHardware {
         rightClaw.setDirection(rightClawDirection);
         rightClaw.setPosition(rightClawPosition);
      }
+
+
+     public void raiseOrLowerArm (int newLocation, int deviation) {
+        int negNewLocation = Math.abs(newLocation) * -1;
+        boolean goingUp = negNewLocation < baseRotationMotor.getCurrentPosition();
+        int loopBreakPoint = goingUp ? negNewLocation + deviation : negNewLocation - deviation;
+         rotationMotorSetPoint = negNewLocation;
+         while (myOpMode.opModeIsActive() &&
+                 ((goingUp && baseRotationMotor.getCurrentPosition() < deviation)
+                         || (!goingUp && baseRotationMotor.getCurrentPosition() > deviation))) {
+             runClosedLoops();
+             myOpMode.telemetry.addData(goingUp ? "Lifting" : "Dropping"  + " arm to " + negNewLocation, RobotHardware.baseRotationMotor.getCurrentPosition());
+             myOpMode.telemetry.update();
+
+         }
+         myOpMode.sleep(50);
+     }
+
      public void runClosedLoops() {
          runBaseMotorClosedLoopWithGravityStabilized();
          runShaftMotorClosedLoop();
@@ -367,7 +383,7 @@ public class RobotHardware {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        sleep(100);   // optional pause after each move.
+        myOpMode.sleep(100);   // optional pause after each move.
     }
 
 
@@ -398,5 +414,83 @@ public class RobotHardware {
             encoderMove(speed, timeoutS, newLeftFrontTarget, newRightFrontTarget, newLeftBackTarget, newRightBackTarget);
 
         }
+    }
+
+
+    public void liftPixelForPlacement() {
+        // raise arm a little
+        // bring in boom
+        // raise arm the rest of the way
+        // flip wrist
+
+        // base rotation up
+        raiseOrLowerArm(-400, 100);
+
+        detractArm();
+
+        //base rotation all the way up
+        raiseOrLowerArm(-1000,100);
+        raiseOrLowerArm(-2000,100);
+        raiseOrLowerArm(-2800,100);
+        raiseOrLowerArm(-3000,100);
+        raiseOrLowerArm(-3300,100);
+
+        //wrist down
+        setWristPositionAndDirection(RobotHardware.WRIST_PLACE_POSITION, Servo.Direction.REVERSE);
+
+
+    }
+
+    public void detractArm() {
+        // de-extend arm
+        boolean isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
+        int revs = 0;
+
+        while (!isLowerPressed && myOpMode.opModeIsActive()) {
+            runClosedLoops();
+            setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
+            myOpMode.sleep(50);
+            isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
+            myOpMode.telemetry.addData("revs", revs++);
+            myOpMode.telemetry.update();
+        }
+        setShaftPowerAndDirection(0, DcMotorSimple.Direction.FORWARD);
+    }
+
+    public void dropArmForPixelPickup() {
+        // flip wrist
+        // boom out partway
+        // drop arm fully
+        // boom all the way out
+
+        // base rotation to -400
+        raiseOrLowerArm(-400, 100);
+
+//         rotate wrist
+        setWristPositionAndDirection(RobotHardware.WRIST_PICKUP_POSITION, Servo.Direction.FORWARD);
+
+        extendArm();
+
+        // base rotation down
+        raiseOrLowerArm(-300, 50);
+        raiseOrLowerArm(-200, 50);
+        raiseOrLowerArm(-50, 150);
+
+    }
+
+    public void extendArm() {
+        // extend arm
+        boolean isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
+        int revs = 0;
+
+        while (isUpperPressed && myOpMode.opModeIsActive()) {
+            runClosedLoops();
+            setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
+            myOpMode.sleep(50);
+            isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
+            myOpMode.telemetry.addData("revs", revs++);
+            myOpMode.telemetry.update();
+        }
+        setShaftPowerAndDirection(0, DcMotorSimple.Direction.REVERSE);
     }
 }

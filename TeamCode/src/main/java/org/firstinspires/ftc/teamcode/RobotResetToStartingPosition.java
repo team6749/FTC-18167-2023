@@ -105,50 +105,20 @@ public class RobotResetToStartingPosition extends LinearOpMode {
 
 
         // base rotation up
-        robot.rotationMotorSetPoint = -400;
-        robot.runClosedLoops();
-        while (RobotHardware.baseRotationMotor.getCurrentPosition() > -300 && opModeIsActive()) {
-            robot.runClosedLoops();
-            telemetry.addData("lifting arm", RobotHardware.baseRotationMotor.getCurrentPosition());
-        }
+        robot.raiseOrLowerArm(-400, 100);
+
 //         rotate wrist
         robot.setWristPositionAndDirection(RobotHardware.WRIST_UP_POSITION, Servo.Direction.FORWARD);
 
-        boolean isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
-        int revs = 0;
-
-        while (!isLowerPressed && opModeIsActive()) {
-            robot.runClosedLoops();
-            robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
-            sleep(50);
-            isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
-            telemetry.addData("revs", revs++);
-            telemetry.update();
-        }
-        robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.FORWARD);
+       robot.detractArm();
         // base rotation down
-        robot.rotationMotorSetPoint = -300;
-        while (RobotHardware.baseRotationMotor.getCurrentPosition() < -300){
-            robot.runClosedLoops();
-            telemetry.addData("dropping arm", RobotHardware.baseRotationMotor.getCurrentPosition());
-        }
-        sleep(100);
+        robot.raiseOrLowerArm(-300,100);
 
         // base rotation down
-        robot.rotationMotorSetPoint = -200;
-        while (RobotHardware.baseRotationMotor.getCurrentPosition() < -200){
-            robot.runClosedLoops();
-            telemetry.addData("dropping arm", RobotHardware.baseRotationMotor.getCurrentPosition());
-        }
-        sleep(100);
+        robot.raiseOrLowerArm(-200,100);
 
             // base rotation down
-        robot.rotationMotorSetPoint = -150;
-        while (RobotHardware.baseRotationMotor.getCurrentPosition() < -160){
-            robot.runClosedLoops();
-            telemetry.addData("dropping arm", RobotHardware.baseRotationMotor.getCurrentPosition());
-        }
-        sleep(100);
+        robot.raiseOrLowerArm(-150,100);
 
         // place pixel
         robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.REVERSE);

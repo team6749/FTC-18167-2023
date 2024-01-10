@@ -103,11 +103,6 @@ public abstract class RobotAutoDrive extends LinearOpMode {
     final double MAX_AUTO_STRAFE = 1.0;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_TURN = 0.8;   //  Clip the turn speed to this max value (adjust for your robot)
 
-    private DcMotor leftFrontDrive = null;  //  Used to control the left front drive wheel
-    private DcMotor rightFrontDrive = null;  //  Used to control the right front drive wheel
-    private DcMotor leftBackDrive = null;  //  Used to control the left back drive wheel
-    private DcMotor rightBackDrive = null;  //  Used to control the right back drive wheel
-
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
@@ -162,59 +157,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
             robot.turn(MAX_AUTO_TURN, 90, 3);
             robot.turn(MAX_AUTO_TURN, 60, 3);
         }
-        // base rotation up
-        robot.rotationMotorSetPoint = -400;
-        robot.runClosedLoops();
-        while (RobotHardware.baseRotationMotor.getCurrentPosition() > -300 && opModeIsActive()) {
-            robot.runClosedLoops();
-            telemetry.addData("lifting arm", RobotHardware.baseRotationMotor.getCurrentPosition());
-        }
-//         rotate wrist
-        robot.setWristPositionAndDirection(RobotHardware.WRIST_PICKUP_POSITION, Servo.Direction.FORWARD);
-
-        // extend arm
-        boolean isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
-        int revs = 0;
-
-        while (isUpperPressed && opModeIsActive()) {
-            robot.runClosedLoops();
-            robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
-            sleep(50);
-            isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
-            telemetry.addData("revs", revs++);
-            telemetry.update();
-        }
-        robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.REVERSE);
-
-
-        // base rotation down
-        robot.rotationMotorSetPoint = -300;
-        while (RobotHardware.baseRotationMotor.getCurrentPosition() < -350){
-            robot.runClosedLoops();
-            telemetry.addData("dropping arm to -300", RobotHardware.baseRotationMotor.getCurrentPosition());
-            telemetry.update();
-
-        }
-        sleep(50);
-
-        // base rotation down
-        robot.rotationMotorSetPoint = -200;
-        while (RobotHardware.baseRotationMotor.getCurrentPosition() < -250){
-            robot.runClosedLoops();
-            telemetry.addData("dropping arm to -200", RobotHardware.baseRotationMotor.getCurrentPosition());
-            telemetry.update();
-
-        }
-        sleep(50);
-
-            // base rotation down
-        robot.rotationMotorSetPoint = -120;
-        while (RobotHardware.baseRotationMotor.getCurrentPosition() < -200){
-            robot.runClosedLoops();
-            telemetry.addData("dropping arm to -150", RobotHardware.baseRotationMotor.getCurrentPosition());
-            telemetry.update();
-        }
-        sleep(50);
+        robot.dropArmForPixelPickup();
 
         // place pixel
         robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
@@ -232,19 +175,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
             telemetry.addData("lifting arm", RobotHardware.baseRotationMotor.getCurrentPosition());
         }
 
-        // de-extend arm
-        boolean isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
-        revs = 0;
-
-        while (!isLowerPressed && opModeIsActive()) {
-            robot.runClosedLoops();
-            robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
-            sleep(50);
-            isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
-            telemetry.addData("revs", revs++);
-            telemetry.update();
-        }
-        robot.setShaftPowerAndDirection(0, DcMotorSimple.Direction.FORWARD);
+        robot.detractArm();
 
         if (blueTeam) {
             if (spikePos == 1) {
@@ -294,15 +225,31 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
         if (targetFound) {
 
-            // Lift Arm
+            robot.liftPixelForPlacement();
 
-            // flip wrist
-
-            // Extend Arm
             // drop pixel
+        robot.setLeftClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.REVERSE);// base rotation up
+            robot.raiseOrLowerArm(-400, 100);
 
+//         rotate wrist
+            robot.setWristPositionAndDirection(RobotHardware.WRIST_UP_POSITION, Servo.Direction.FORWARD);
 
+            robot.detractArm();
+            // base rotation down
+            robot.raiseOrLowerArm(-300,100);
 
+            // base rotation down
+            robot.raiseOrLowerArm(-200,100);
+
+            // base rotation down
+            robot.raiseOrLowerArm(-150,100);
+
+            if (blueTeam) {
+                robot.encoderStrafe(MAX_AUTO_SPEED, -20, -20, 3);
+            } else {
+                robot.encoderStrafe(MAX_AUTO_SPEED, 20, 20, 3);
+            }
+            robot.encoderDrive(MAX_AUTO_SPEED,5,5,3);
         }
 
 
@@ -311,101 +258,6 @@ public abstract class RobotAutoDrive extends LinearOpMode {
             robot.runClosedLoops();
 
         }
-
-//            // base rotation up
-//            robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_PLACE;
-//            robot.runBaseMotorClosedLoopWithGravityStabilized();
-//            while (RobotHardware.baseRotationMotor.getCurrentPosition() < RobotHardware.BASE_ROTATION_PLACE + 100){
-//                telemetry.addData("lifting arm","%4.2f", RobotHardware.baseRotationMotor.getCurrentPosition());
-//            }
-//
-//            // extend arm
-//            while (RobotHardware.upperLimitSwitch.isPressed()) {
-//                robot.setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
-//            }
-//
-//            // rotate wrist
-//            robot.setWristPositionAndDirection(RobotHardware.WRIST_UP_POSITION, Servo.Direction.FORWARD);
-//
-//            // move to pixel board forward 48 in
-//            robot.encoderDrive(MAX_AUTO_SPEED,48,48,18);
-//
-//            // place pixels
-//            robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION,Servo.Direction.FORWARD);
-//
-//            sleep(500);
-//
-//            // strafe left
-//            robot.encoderStrafe(MAX_AUTO_STRAFE,25,25,8);
-//
-//            // move forward
-//            robot.encoderDrive(MAX_AUTO_SPEED,10,10,4);
-//
-
-
-
-//            targetFound = false;
-//            desiredTag  = null;
-
-//            // Step through the list of detected tags and look for a matching tag
-//            List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-//            for (AprilTagDetection detection : currentDetections) {
-//                // Look to see if we have size info on this tag.
-//                if (detection.metadata != null) {
-//                    //  Check to see if we want to track towards this tag.
-//                    if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
-//                        // Yes, we want to use this tag.
-//                        targetFound = true;
-//                        desiredTag = detection;
-//                        break;  // don't look any further.
-//                    } else {
-//                        // This tag is in the library, but we do not want to track it right now.
-//                        telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
-//                    }
-//                } else {
-//                    // This tag is NOT in the library, so we don't have enough information to track to it.
-//                    telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-//                }
-//            }
-
-        // Tell the driver what we see, and what to do.
-//            if (targetFound) {
-//                telemetry.addData("\n>","HOLD Left-Bumper to Drive to Target\n");
-//                telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-//                telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
-//                telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
-//                telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
-//            } else {
-//                telemetry.addData("\n>","Drive using joysticks to find valid target\n");
-//            }
-//
-//            // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-//            if (gamepad1.left_bumper && targetFound) {
-
-//                // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-//                double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
-//                double  headingError    = desiredTag.ftcPose.bearing;
-//                double  yawError        = desiredTag.ftcPose.yaw;
-//
-//                // Use the speed and turn "gains" to calculate how we want the robot to move.
-//                drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-//                turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
-//                strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-
-//                telemetry.addData("Auto","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-//            } else {
-//
-//                // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-//                drive  = -gamepad1.left_stick_y;  // Reduce drive rate to 50%.
-//                strafe = -gamepad1.left_stick_x;  // Reduce strafe rate to 50%.
-//                turn   = -gamepad1.right_stick_x;  // Reduce turn rate to 33%.
-//                telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-//            }
-//            telemetry.update();
-//
-//            // Apply desired axes motions to the drivetrain.
-//            moveRobot(drive, strafe, turn);
-//            sleep(10);
     }
 
     /**
