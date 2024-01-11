@@ -56,7 +56,7 @@ public class RobotHardware {
 
     public static final int BASE_ROTATION_PLACE = -3300;
 
-    public static final int BASE_ROTATION_CLIMB = -2048;
+    public static final int BASE_ROTATION_CLIMB = -2200;
 
 
     //This is probably pretty close, but could be off
@@ -212,20 +212,25 @@ public class RobotHardware {
         rightClaw.setPosition(rightClawPosition);
      }
 
+    public void raiseOrLowerArm (int newLocation, int deviation) {
+        raiseOrLowerArm(newLocation, deviation, .5);
+    }
 
-     public void raiseOrLowerArm (int newLocation, int deviation) {
+     public void raiseOrLowerArm (int newLocation, int deviation, double timeoutMs) {
         int negNewLocation = Math.abs(newLocation) * -1;
         boolean goingUp = negNewLocation < baseRotationMotor.getCurrentPosition();
         int loopBreakPoint = goingUp ? negNewLocation + deviation : negNewLocation - deviation;
          rotationMotorSetPoint = negNewLocation;
+         double timeoutTime = myOpMode.getRuntime() + timeoutMs;
          while (myOpMode.opModeIsActive() &&
+                 myOpMode.getRuntime() < timeoutTime &&
                  ((goingUp && baseRotationMotor.getCurrentPosition() < loopBreakPoint)
                          || (!goingUp && baseRotationMotor.getCurrentPosition() > loopBreakPoint))) {
              runClosedLoops();
              myOpMode.telemetry.addData(goingUp ? "Lifting" : "Dropping"  + " arm to " + negNewLocation, RobotHardware.baseRotationMotor.getCurrentPosition());
              myOpMode.telemetry.update();
 
-         }h
+         }
          myOpMode.sleep(50);
      }
 
@@ -426,6 +431,9 @@ public class RobotHardware {
         // base rotation up
         raiseOrLowerArm(-400, 100);
 
+        //wrist down
+        setWristPositionAndDirection(RobotHardware.WRIST_PLACE_POSITION, Servo.Direction.FORWARD);
+
         detractArm();
 
         //base rotation all the way up
@@ -434,9 +442,6 @@ public class RobotHardware {
         raiseOrLowerArm(-2800,100);
         raiseOrLowerArm(-3000,100);
         raiseOrLowerArm(-3300,100);
-
-        //wrist down
-        setWristPositionAndDirection(RobotHardware.WRIST_PLACE_POSITION, Servo.Direction.REVERSE);
 
 
     }
@@ -470,12 +475,12 @@ public class RobotHardware {
         extendArm();
         //         rotate wrist
         setWristPositionAndDirection(RobotHardware.WRIST_PICKUP_POSITION, Servo.Direction.FORWARD);
-
+        myOpMode.sleep(30);
 
         // base rotation down
         raiseOrLowerArm(-300, 50);
         raiseOrLowerArm(-200, 50);
-        raiseOrLowerArm(-25, 150);
+        raiseOrLowerArm(-25, 50);
 
     }
 

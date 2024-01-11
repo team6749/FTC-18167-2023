@@ -133,39 +133,40 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             }
 
             // Climbing function defined below :))))
-            if (gamepad1.back && !hasEndGameRun) {
-                // setpoint rotate
-                robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_CLIMB;
-                // wait til brm is within plus minus 50
-                boolean isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
-                int revs = 0;
-                if(Math.abs(RobotHardware.BASE_ROTATION_CLIMB - RobotHardware.baseRotationMotor.getCurrentPosition()) < 50) {                //make arm extend
-                   robot.extendArm();
-
-
-                    robot.darth();
-                    // worked!
-                    sleep(200);
-                    robot.encoderDrive(.7, -16.0, -16.0, 3);
-                    robot.darth();
-
-                    // maybe pause or something pls
-                    sleep(200);
-
-                    //pull robot up (arm considense)
-                    robot.detractArm();
-                    robot.darth();
-
-                    hasEndGameRun = true;
-                }
-            }
+//            if (gamepad1.back && !hasEndGameRun) {
+//                // setpoint rotate
+//                robot.raiseOrLowerArm(RobotHardware.BASE_ROTATION_CLIMB, 100);
+//                robot.rotationMotorSetPoint = RobotHardware.BASE_ROTATION_CLIMB;
+//                // wait til brm is within plus minus 50
+//                boolean isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
+//                int revs = 0;
+//                if(Math.abs(RobotHardware.BASE_ROTATION_CLIMB - RobotHardware.baseRotationMotor.getCurrentPosition()) < 50) {                //make arm extend
+//                   robot.extendArm();
+//
+//
+//                    robot.darth();
+//                    // worked!
+//                    sleep(200);
+//                    robot.encoderDrive(.7, -16.0, -16.0, 3);
+//                    robot.darth();
+//
+//                    // maybe pause or something pls
+//                    sleep(200);
+//
+//                    //pull robot up (arm considense)
+//                    robot.detractArm();
+//                    robot.darth();
+//
+//                    hasEndGameRun = true;
+//                }
+//            }
             if (gamepad1.back) {
-                robot.runClosedLoops();
-                robot.raiseOrLowerArm(-2000,100);
+                robot.raiseOrLowerArm(RobotHardware.BASE_ROTATION_CLIMB,100);
 
-            } else {
-                robot.runClosedLoops();
             }
+
+            robot.runClosedLoops();
+
 
             if (gamepad1.left_stick_button == true) {
                 robot.raiseOrLowerArm(-400,100);

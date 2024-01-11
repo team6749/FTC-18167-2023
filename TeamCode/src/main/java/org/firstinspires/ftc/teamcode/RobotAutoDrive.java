@@ -164,7 +164,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         telemetry.addData("Right Claw Pos", "%4.2f", RobotHardware.rightClaw.getPosition());
         telemetry.update();
 
-        sleep(300);
+        sleep(50);
 
 // ----------------
         // base rotation up
