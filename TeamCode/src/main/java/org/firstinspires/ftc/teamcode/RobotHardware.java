@@ -219,13 +219,13 @@ public class RobotHardware {
         int loopBreakPoint = goingUp ? negNewLocation + deviation : negNewLocation - deviation;
          rotationMotorSetPoint = negNewLocation;
          while (myOpMode.opModeIsActive() &&
-                 ((goingUp && baseRotationMotor.getCurrentPosition() < deviation)
-                         || (!goingUp && baseRotationMotor.getCurrentPosition() > deviation))) {
+                 ((goingUp && baseRotationMotor.getCurrentPosition() < loopBreakPoint)
+                         || (!goingUp && baseRotationMotor.getCurrentPosition() > loopBreakPoint))) {
              runClosedLoops();
              myOpMode.telemetry.addData(goingUp ? "Lifting" : "Dropping"  + " arm to " + negNewLocation, RobotHardware.baseRotationMotor.getCurrentPosition());
              myOpMode.telemetry.update();
 
-         }
+         }h
          myOpMode.sleep(50);
      }
 

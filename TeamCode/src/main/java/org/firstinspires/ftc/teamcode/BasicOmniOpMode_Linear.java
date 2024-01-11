@@ -115,19 +115,19 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
             // Move Claws
             if (gamepad1.a || gamepad1.b || gamepad2.a || gamepad2.b) {
-                double clawPosition = gamepad1.b || gamepad2.b ? RobotHardware.CLAW_OPEN_POSITION : RobotHardware.CLAW_CLOSED_POSITION;
-                if (!gamepad1.right_bumper || gamepad2.right_bumper) {
+                double clawPosition = (gamepad1.b || gamepad2.b) ? RobotHardware.CLAW_OPEN_POSITION : RobotHardware.CLAW_CLOSED_POSITION;
+                if (!gamepad1.right_bumper && !gamepad2.right_bumper) {
                     robot.setRightClawPositionAndDirection(clawPosition, Servo.Direction.FORWARD);
                 }
-                if (!gamepad1.left_bumper || gamepad2.left_bumper) {
+                if (!gamepad1.left_bumper && !gamepad2.left_bumper) {
                     robot.setLeftClawPositionAndDirection(clawPosition, Servo.Direction.REVERSE);
                 }
             }
 
             //wrist
             if (gamepad1.x || gamepad1.y || gamepad2.x || gamepad2.y) {
-                double wristPosition = gamepad1.x || gamepad2.x ? RobotHardware.WRIST_PLACE_POSITION : RobotHardware.WRIST_PICKUP_POSITION;
-                Servo.Direction wristDirection = gamepad1.x || gamepad2.x ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
+                double wristPosition = (gamepad1.x || gamepad2.x) ? RobotHardware.WRIST_PLACE_POSITION : RobotHardware.WRIST_PICKUP_POSITION;
+                Servo.Direction wristDirection = (gamepad1.x || gamepad2.x) ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
                 robot.setWristPositionAndDirection(wristPosition, wristDirection);
 
             }
