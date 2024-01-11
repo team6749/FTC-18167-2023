@@ -464,17 +464,18 @@ public class RobotHardware {
         // boom all the way out
 
         // base rotation to -400
+        raiseOrLowerArm(-600, 100);
         raiseOrLowerArm(-400, 100);
 
-//         rotate wrist
+        extendArm();
+        //         rotate wrist
         setWristPositionAndDirection(RobotHardware.WRIST_PICKUP_POSITION, Servo.Direction.FORWARD);
 
-        extendArm();
 
         // base rotation down
         raiseOrLowerArm(-300, 50);
         raiseOrLowerArm(-200, 50);
-        raiseOrLowerArm(-50, 150);
+        raiseOrLowerArm(-25, 150);
 
     }
 
