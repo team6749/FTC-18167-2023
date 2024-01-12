@@ -213,25 +213,55 @@ public class RobotHardware {
      }
 
     public void raiseOrLowerArm (int newLocation, int deviation) {
-        raiseOrLowerArm(newLocation, deviation, .5);
+        raiseOrLowerArm(newLocation, deviation, 10);
     }
 
-     public void raiseOrLowerArm (int newLocation, int deviation, double timeoutMs) {
+     public void raiseOrLowerArm (int newLocation, int deviation, double timeoutSec) {
         int negNewLocation = Math.abs(newLocation) * -1;
         boolean goingUp = negNewLocation < baseRotationMotor.getCurrentPosition();
         int loopBreakPoint = goingUp ? negNewLocation + deviation : negNewLocation - deviation;
          rotationMotorSetPoint = negNewLocation;
-         double timeoutTime = myOpMode.getRuntime() + timeoutMs;
-         while (myOpMode.opModeIsActive() &&
-                 myOpMode.getRuntime() < timeoutTime &&
-                 ((goingUp && baseRotationMotor.getCurrentPosition() < loopBreakPoint)
-                         || (!goingUp && baseRotationMotor.getCurrentPosition() > loopBreakPoint))) {
-             runClosedLoops();
-             myOpMode.telemetry.addData(goingUp ? "Lifting" : "Dropping"  + " arm to " + negNewLocation, RobotHardware.baseRotationMotor.getCurrentPosition());
-             myOpMode.telemetry.update();
+         double timeoutTime = myOpMode.getRuntime() + timeoutSec;
 
-         }
-         myOpMode.sleep(50);
+
+         myOpMode.telemetry.addData("Current Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
+         myOpMode.telemetry.addData("Runtime", myOpMode.getRuntime());
+         myOpMode.telemetry.addData("timeoutTime", timeoutTime);
+
+         myOpMode.telemetry.addData("Going Up", goingUp);
+         myOpMode.telemetry.addData("loopBreakPoint", loopBreakPoint);
+
+
+         myOpMode.telemetry.addData("active", myOpMode.opModeIsActive());
+         myOpMode.telemetry.addData("runtime", myOpMode.getRuntime() < timeoutTime);
+         myOpMode.telemetry.addData("runIt", ((goingUp && baseRotationMotor.getCurrentPosition() < loopBreakPoint)
+                 || (!goingUp && baseRotationMotor.getCurrentPosition() > loopBreakPoint)));
+
+         myOpMode.telemetry.update();
+
+//         robotSleep(3000);
+//         runClosedLoops();
+
+//         while (myOpMode.opModeIsActive() &&
+//                 myOpMode.getRuntime() < timeoutTime) {
+//             myOpMode.telemetry.addData("CurrentPos", baseRotationMotor.getCurrentPosition());
+//             myOpMode.telemetry.addData("Loop Break Point", loopBreakPoint);
+//             myOpMode.telemetry.addData("Going Up", goingUp);
+//             myOpMode.telemetry.addData("LessThan", baseRotationMotor.getCurrentPosition() < loopBreakPoint);
+//             myOpMode.telemetry.addData("GreaterThan", baseRotationMotor.getCurrentPosition() > loopBreakPoint);
+
+
+//             ((goingUp && baseRotationMotor.getCurrentPosition() < loopBreakPoint)
+//                         || (!goingUp && baseRotationMotor.getCurrentPosition() > loopBreakPoint))){
+                 runClosedLoops();
+                 myOpMode.telemetry.addData(goingUp ? "Lifting" : "Dropping" + " arm to " + negNewLocation, RobotHardware.baseRotationMotor.getCurrentPosition());
+                 myOpMode.telemetry.update();
+//             }
+//         }
+//         myOpMode.telemetry.addData("DONE" + ( goingUp ? "Lifting" : "Dropping")  + " arm to " + negNewLocation, RobotHardware.baseRotationMotor.getCurrentPosition());
+//         myOpMode.telemetry.update();
+
+         robotSleep(300);
      }
 
      public void runClosedLoops() {
@@ -388,7 +418,7 @@ public class RobotHardware {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        myOpMode.sleep(100);   // optional pause after each move.
+        robotSleep(100);   // optional pause after each move.
     }
 
 
@@ -454,7 +484,7 @@ public class RobotHardware {
         while (!isLowerPressed && myOpMode.opModeIsActive()) {
             runClosedLoops();
             setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
-            myOpMode.sleep(50);
+            robotSleep(50);
             isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
             myOpMode.telemetry.addData("revs", revs++);
             myOpMode.telemetry.update();
@@ -470,17 +500,17 @@ public class RobotHardware {
 
         // base rotation to -400
         raiseOrLowerArm(-600, 100);
-        raiseOrLowerArm(-400, 100);
+//        raiseOrLowerArm(-400, 100);
 
         extendArm();
         //         rotate wrist
         setWristPositionAndDirection(RobotHardware.WRIST_PICKUP_POSITION, Servo.Direction.FORWARD);
-        myOpMode.sleep(30);
+        robotSleep(500);
 
         // base rotation down
         raiseOrLowerArm(-300, 50);
         raiseOrLowerArm(-200, 50);
-        raiseOrLowerArm(-25, 50);
+        raiseOrLowerArm(20, 50);
 
     }
 
@@ -492,11 +522,21 @@ public class RobotHardware {
         while (isUpperPressed && myOpMode.opModeIsActive()) {
             runClosedLoops();
             setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
-            myOpMode.sleep(50);
+            robotSleep(50);
             isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
             myOpMode.telemetry.addData("revs", revs++);
             myOpMode.telemetry.update();
         }
         setShaftPowerAndDirection(0, DcMotorSimple.Direction.REVERSE);
+    }
+    
+    
+    public void robotSleep(int milliseconds) {
+        int iterations = milliseconds / 50;
+        for (int i = 0; i < iterations; i++) {
+            myOpMode.sleep(50);
+            runClosedLoops();
+        }
+
     }
 }

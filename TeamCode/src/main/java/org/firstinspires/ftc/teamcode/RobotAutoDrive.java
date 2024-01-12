@@ -141,8 +141,8 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         robot.setRightClawPositionAndDirection(1, Servo.Direction.FORWARD);
         robot.setLeftClawPositionAndDirection(1, Servo.Direction.REVERSE);
 
-        // go forward 22 in
-        robot.encoderDrive(MAX_AUTO_SPEED,22,22,8);
+        // go forward 20 in
+        robot.encoderDrive(MAX_AUTO_SPEED,20,20,8);
 
         if (spikePos == 1) {
             // turn right
@@ -204,7 +204,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
                 robot.turn(MAX_AUTO_TURN, 60, 3);
             }
             //strafe left
-            robot.encoderStrafe(1,2,2,1);
+            //robot.encoderStrafe(1,0,0,1);
         }
 
         //if not backstage, drive forward
