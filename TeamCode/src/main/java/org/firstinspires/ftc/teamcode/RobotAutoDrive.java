@@ -120,11 +120,11 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         double turn = 0;        // Desired turning power/speed (-1 to +1)
 
         // Initialize the Apriltag Detection process
-        initAprilTag();
+//        initAprilTag();
         robot.initTfod();
 
-        if (USE_WEBCAM)
-            setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
+//        if (USE_WEBCAM)
+//            setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
 
         // Wait for driver to press start
         telemetry.addData("Camera preview on/off", "3 dots, Camera Stream");
@@ -136,8 +136,13 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
 
     public int testSpikePos() {
-        List<Recognition> currentRecognitions = robot.tfod.getRecognitions();
-        telemetry.addData("# Objects Detected", currentRecognitions.size());
+        telemetry.addData("Start Detection","");
+        telemetry.update();
+        List<Recognition> currentRecognitions = robot.tfod.getFreshRecognitions();
+        if (currentRecognitions != null) {
+            telemetry.addData("# Objects Detected", currentRecognitions.size());
+            telemetry.update();
+
 
         // Step through the list of recognitions and display info for each one.
         for (Recognition recognition : currentRecognitions) {
@@ -151,8 +156,12 @@ public abstract class RobotAutoDrive extends LinearOpMode {
             telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
 
             telemetry.addData("- Left/Right", "%.0f x %.0f", recognition.getLeft(), recognition.getRight());
-        telemetry.update();
+            telemetry.update();
+
         }   // end for() loop
+        }
+        sleep(50);
+
         return -1;
     }
 
@@ -183,6 +192,12 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
 //TODO       autonomous period that hopefully works and scores many points for us
 
+        ///TESTING CODE TAKE OUT LATER
+        while (opModeIsActive() && !isStopRequested()) {
+            testSpikePos();
+        }
+        //TAKE OUT TESTING CODE ABOVE
+
         //close claws
         robot.setRightClawPositionAndDirection(1, Servo.Direction.FORWARD);
         robot.setLeftClawPositionAndDirection(1, Servo.Direction.REVERSE);
@@ -190,14 +205,11 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         // go forward 10 in
         robot.encoderDrive(MAX_AUTO_SPEED,10,10,8);
 
-        ///TESTING CODE TAKE OUT LATER
-        while (opModeIsActive()) {
-            testSpikePos();
-        }
-        //TAKE OUT TESTING CODE ABOVE
+
 
         int spikePos = determineSpikePos();
-        telemetry.addData("Spike Pos", spikePos);
+        telemetry.addData("Spike Pos",
+                spikePos);
         robot.encoderDrive(MAX_AUTO_SPEED,10,10,8);
 
         if (spikePos == 1) {

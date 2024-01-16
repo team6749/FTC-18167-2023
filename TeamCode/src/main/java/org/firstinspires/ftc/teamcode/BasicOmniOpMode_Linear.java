@@ -110,7 +110,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 } else {
                     robot.dropArmForPixelPickup();
                 }
-                sleep(10);
+//                sleep(10);
             }
 
             // Move Claws

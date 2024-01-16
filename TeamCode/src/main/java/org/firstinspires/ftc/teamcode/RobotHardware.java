@@ -227,10 +227,10 @@ public class RobotHardware {
         visionPortal = builder.build();
 
         // Set confidence threshold for TFOD recognitions, at any time.
-        tfod.setMinResultConfidence(0.75f);
+        tfod.setMinResultConfidence(0.5f);
 
         // Disable or re-enable the TFOD processor at any time.
-        //visionPortal.setProcessorEnabled(tfod, true);
+        visionPortal.setProcessorEnabled(tfod, true);
 
     }   // end method initTfod()
 
@@ -287,22 +287,23 @@ public class RobotHardware {
     }
 
      public void raiseOrLowerArm (int newLocation, int deviation, double timeoutSec) {
-        int negNewLocation = Math.abs(newLocation) * -1;
-        boolean goingUp = negNewLocation < baseRotationMotor.getCurrentPosition();
+//        int negNewLocation = Math.abs(newLocation) * -1;
+        boolean goingUp = newLocation < baseRotationMotor.getCurrentPosition();
 //        int loopBreakPoint = goingUp ? negNewLocation + deviation : negNewLocation - deviation;
-         rotationMotorSetPoint = negNewLocation;
+         rotationMotorSetPoint = newLocation;
 
 //         double timeoutTime = myOpMode.getRuntime() + timeoutMs;
 //         while (myOpMode.opModeIsActive() &&
 //                 myOpMode.getRuntime() < timeoutTime &&
 //                 ((goingUp && baseRotationMotor.getCurrentPosition() < loopBreakPoint)
 //                         || (!goingUp && baseRotationMotor.getCurrentPosition() > loopBreakPoint))) {
+         myOpMode.telemetry.addData((goingUp ? "Lifting" : "Dropping")  + " arm to ", newLocation);
+         myOpMode.telemetry.update();
              runClosedLoops();
-             myOpMode.telemetry.addData(goingUp ? "Lifting" : "Dropping"  + " arm to " + negNewLocation, RobotHardware.baseRotationMotor.getCurrentPosition());
-             myOpMode.telemetry.update();
+
 
 //         }
-         sleep(60);
+//         sleep(60);
      }
 
      public void runClosedLoops() {
@@ -539,17 +540,17 @@ public class RobotHardware {
         // drop arm fully
         // boom all the way out
 
-        // base rotation to -400
-        if (baseRotationMotor.getCurrentPosition() < -700) {
-            raiseOrLowerArm(-600, 100);
-        }
+//        // base rotation to -400
+//        if (baseRotationMotor.getCurrentPosition() < -700) {
+//            raiseOrLowerArm(-600, 100);
+//        }
         raiseOrLowerArm(-400, 100);
 
         extendArm();
         //         rotate wrist
         setWristPositionAndDirection(RobotHardware.WRIST_PICKUP_POSITION, Servo.Direction.FORWARD);
 
-        sleep(30);
+//        sleep(30);
 
         // base rotation down
         raiseOrLowerArm(-300, 50);
@@ -576,10 +577,10 @@ public class RobotHardware {
     
 
     public void sleep(int milliseconds) {
-        int iterations = milliseconds / 20;
-        for (int i = 0; i < iterations; i++) {
-            sleep(20);
-            runClosedLoops();
-        }
+//        int iterations = milliseconds / 20;
+//        for (int i = 0; i < iterations; i++) {
+//            sleep(20);
+//            runClosedLoops();
+//        }
     }
 }
