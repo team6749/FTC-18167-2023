@@ -46,7 +46,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.concurrent.TimeUnit;
 
 
-@Autonomous(name = "Blue-1", group = "Autonomous")
+@Autonomous(name = "Blue-Frontstage", group = "Autonomous")
 public class RobotAutoDriveBlue1 extends RobotAutoDrive {
 
 
@@ -55,7 +55,7 @@ public class RobotAutoDriveBlue1 extends RobotAutoDrive {
         super.initBase();
 
         if (opModeIsActive()) {
-            autoDrive(true,false, 1);
+            autoDrive(true,false);
         }
     }
 

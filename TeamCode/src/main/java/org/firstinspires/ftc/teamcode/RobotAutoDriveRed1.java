@@ -32,7 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 
-@Autonomous(name = "Red-1", group = "Autonomous")
+@Autonomous(name = "Red-Frontstage", group = "Autonomous")
 public class RobotAutoDriveRed1 extends RobotAutoDrive {
 
 
@@ -41,7 +41,7 @@ public class RobotAutoDriveRed1 extends RobotAutoDrive {
         super.initBase();
 
         if (opModeIsActive()) {
-            autoDrive(false,false, 1);
+            autoDrive(false,false);
         }
     }
 

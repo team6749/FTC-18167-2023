@@ -39,6 +39,10 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.android.AndroidSoundPool;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 
 public class RobotHardware {
@@ -94,6 +98,9 @@ public class RobotHardware {
     static final double     COUNTS_PER_INCH         = 18.70129;//(COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /(WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     DRIVE_SPEED             = 0.6;
     static final double     TURN_SPEED              = 0.5;
+    public static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+    public TfodProcessor tfod;
+    public VisionPortal visionPortal;
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public RobotHardware(LinearOpMode opmode) {
@@ -163,7 +170,70 @@ public class RobotHardware {
 //            myOpMode.telemetry.update();
 //
 //        }
+
     }
+
+    public void initTfod() {
+
+        // Create the TensorFlow processor by using a builder.
+        tfod = new TfodProcessor.Builder()
+
+                // With the following lines commented out, the default TfodProcessor Builder
+                // will load the default model for the season. To define a custom model to load,
+                // choose one of the following:
+                //   Use setModelAssetName() if the custom TF Model is built in as an asset (AS only).
+                //   Use setModelFileName() if you have downloaded a custom team model to the Robot Controller.
+                //.setModelAssetName(TFOD_MODEL_ASSET)
+                //.setModelFileName(TFOD_MODEL_FILE)
+
+                // The following default settings are available to un-comment and edit as needed to
+                // set parameters for custom models.
+                //.setModelLabels(LABELS)
+                //.setIsModelTensorFlow2(true)
+                //.setIsModelQuantized(true)
+                //.setModelInputSize(300)
+                //.setModelAspectRatio(16.0 / 9.0)
+
+                .build();
+
+        // Create the vision portal by using a builder.
+        VisionPortal.Builder builder = new VisionPortal.Builder();
+
+        // Set the camera (webcam vs. built-in RC phone camera).
+        if (USE_WEBCAM) {
+            builder.setCamera(myOpMode.hardwareMap.get(WebcamName.class, "Webcam 1"));
+        } else {
+            builder.setCamera(BuiltinCameraDirection.BACK);
+        }
+
+        // Choose a camera resolution. Not all cameras support all resolutions.
+//        builder.setCameraResolution(new Size(640, 480));
+
+        // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
+        //builder.enableLiveView(true);
+
+        // Set the stream format; MJPEG uses less bandwidth than default YUY2.
+        //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
+
+        // Choose whether or not LiveView stops if no processors are enabled.
+        // If set "true", monitor shows solid orange screen if no processors enabled.
+        // If set "false", monitor shows camera view without annotations.
+        //builder.setAutoStopLiveView(false);
+
+        // Set and enable the processor.
+        builder.addProcessor(tfod);
+
+        // Build the Vision Portal, using the above settings.
+        visionPortal = builder.build();
+
+        // Set confidence threshold for TFOD recognitions, at any time.
+        tfod.setMinResultConfidence(0.75f);
+
+        // Disable or re-enable the TFOD processor at any time.
+        //visionPortal.setProcessorEnabled(tfod, true);
+
+    }   // end method initTfod()
+
 
 
     /**
@@ -219,49 +289,20 @@ public class RobotHardware {
      public void raiseOrLowerArm (int newLocation, int deviation, double timeoutSec) {
         int negNewLocation = Math.abs(newLocation) * -1;
         boolean goingUp = negNewLocation < baseRotationMotor.getCurrentPosition();
-        int loopBreakPoint = goingUp ? negNewLocation + deviation : negNewLocation - deviation;
+//        int loopBreakPoint = goingUp ? negNewLocation + deviation : negNewLocation - deviation;
          rotationMotorSetPoint = negNewLocation;
-         double timeoutTime = myOpMode.getRuntime() + timeoutSec;
 
-
-         myOpMode.telemetry.addData("Current Pos", RobotHardware.baseRotationMotor.getCurrentPosition());
-         myOpMode.telemetry.addData("Runtime", myOpMode.getRuntime());
-         myOpMode.telemetry.addData("timeoutTime", timeoutTime);
-
-         myOpMode.telemetry.addData("Going Up", goingUp);
-         myOpMode.telemetry.addData("loopBreakPoint", loopBreakPoint);
-
-
-         myOpMode.telemetry.addData("active", myOpMode.opModeIsActive());
-         myOpMode.telemetry.addData("runtime", myOpMode.getRuntime() < timeoutTime);
-         myOpMode.telemetry.addData("runIt", ((goingUp && baseRotationMotor.getCurrentPosition() < loopBreakPoint)
-                 || (!goingUp && baseRotationMotor.getCurrentPosition() > loopBreakPoint)));
-
-         myOpMode.telemetry.update();
-
-//         robotSleep(3000);
-//         runClosedLoops();
-
+//         double timeoutTime = myOpMode.getRuntime() + timeoutMs;
 //         while (myOpMode.opModeIsActive() &&
-//                 myOpMode.getRuntime() < timeoutTime) {
-//             myOpMode.telemetry.addData("CurrentPos", baseRotationMotor.getCurrentPosition());
-//             myOpMode.telemetry.addData("Loop Break Point", loopBreakPoint);
-//             myOpMode.telemetry.addData("Going Up", goingUp);
-//             myOpMode.telemetry.addData("LessThan", baseRotationMotor.getCurrentPosition() < loopBreakPoint);
-//             myOpMode.telemetry.addData("GreaterThan", baseRotationMotor.getCurrentPosition() > loopBreakPoint);
+//                 myOpMode.getRuntime() < timeoutTime &&
+//                 ((goingUp && baseRotationMotor.getCurrentPosition() < loopBreakPoint)
+//                         || (!goingUp && baseRotationMotor.getCurrentPosition() > loopBreakPoint))) {
+             runClosedLoops();
+             myOpMode.telemetry.addData(goingUp ? "Lifting" : "Dropping"  + " arm to " + negNewLocation, RobotHardware.baseRotationMotor.getCurrentPosition());
+             myOpMode.telemetry.update();
 
-
-//             ((goingUp && baseRotationMotor.getCurrentPosition() < loopBreakPoint)
-//                         || (!goingUp && baseRotationMotor.getCurrentPosition() > loopBreakPoint))){
-                 runClosedLoops();
-                 myOpMode.telemetry.addData(goingUp ? "Lifting" : "Dropping" + " arm to " + negNewLocation, RobotHardware.baseRotationMotor.getCurrentPosition());
-                 myOpMode.telemetry.update();
-//             }
 //         }
-//         myOpMode.telemetry.addData("DONE" + ( goingUp ? "Lifting" : "Dropping")  + " arm to " + negNewLocation, RobotHardware.baseRotationMotor.getCurrentPosition());
-//         myOpMode.telemetry.update();
-
-         robotSleep(300);
+         sleep(60);
      }
 
      public void runClosedLoops() {
@@ -418,7 +459,7 @@ public class RobotHardware {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robotSleep(100);   // optional pause after each move.
+        sleep(100);   // optional pause after each move.
     }
 
 
@@ -484,7 +525,7 @@ public class RobotHardware {
         while (!isLowerPressed && myOpMode.opModeIsActive()) {
             runClosedLoops();
             setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
-            robotSleep(50);
+            sleep(50);
             isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
             myOpMode.telemetry.addData("revs", revs++);
             myOpMode.telemetry.update();
@@ -499,13 +540,16 @@ public class RobotHardware {
         // boom all the way out
 
         // base rotation to -400
-        raiseOrLowerArm(-600, 100);
-//        raiseOrLowerArm(-400, 100);
+        if (baseRotationMotor.getCurrentPosition() < -700) {
+            raiseOrLowerArm(-600, 100);
+        }
+        raiseOrLowerArm(-400, 100);
 
         extendArm();
         //         rotate wrist
         setWristPositionAndDirection(RobotHardware.WRIST_PICKUP_POSITION, Servo.Direction.FORWARD);
-        robotSleep(500);
+
+        sleep(30);
 
         // base rotation down
         raiseOrLowerArm(-300, 50);
@@ -522,7 +566,7 @@ public class RobotHardware {
         while (isUpperPressed && myOpMode.opModeIsActive()) {
             runClosedLoops();
             setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
-            robotSleep(50);
+            sleep(50);
             isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
             myOpMode.telemetry.addData("revs", revs++);
             myOpMode.telemetry.update();
@@ -530,13 +574,12 @@ public class RobotHardware {
         setShaftPowerAndDirection(0, DcMotorSimple.Direction.REVERSE);
     }
     
-    
-    public void robotSleep(int milliseconds) {
-        int iterations = milliseconds / 50;
+
+    public void sleep(int milliseconds) {
+        int iterations = milliseconds / 20;
         for (int i = 0; i < iterations; i++) {
-            myOpMode.sleep(50);
+            sleep(20);
             runClosedLoops();
         }
-
     }
 }

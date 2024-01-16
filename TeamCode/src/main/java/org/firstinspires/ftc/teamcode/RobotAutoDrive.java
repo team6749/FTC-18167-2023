@@ -41,6 +41,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -120,7 +121,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
         // Initialize the Apriltag Detection process
         initAprilTag();
-
+        robot.initTfod();
 
         if (USE_WEBCAM)
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
@@ -133,7 +134,52 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
     }
 
-    protected void autoDrive(boolean blueTeam, boolean isBackStage, int spikePos) throws InterruptedException {
+
+    public int testSpikePos() {
+        List<Recognition> currentRecognitions = robot.tfod.getRecognitions();
+        telemetry.addData("# Objects Detected", currentRecognitions.size());
+
+        // Step through the list of recognitions and display info for each one.
+        for (Recognition recognition : currentRecognitions) {
+
+            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
+            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+
+            telemetry.addData(""," ");
+            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+            telemetry.addData("- Position", "%.0f / %.0f", x, y);
+            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
+
+            telemetry.addData("- Left/Right", "%.0f x %.0f", recognition.getLeft(), recognition.getRight());
+        telemetry.update();
+        }   // end for() loop
+        return -1;
+    }
+
+    public int determineSpikePos() {
+        int spikeMark = 2;
+        List<Recognition> currentRecognitions = robot.tfod.getRecognitions();
+        telemetry.addData("# Objects Detected", currentRecognitions.size());
+
+        // Step through the list of recognitions and display info for each one.
+        for (Recognition recognition : currentRecognitions) {
+            // TODO -- NOT SURE THIS IS the right label
+            if ("White Pixel".equals(recognition.getLabel())) {
+                double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
+                if (x < -10) {
+                    spikeMark = 1;
+                } else if (x > 10) {
+                    spikeMark = 3;
+                } else {
+                    spikeMark = 2;
+                }
+            }
+        }   // end for() loop
+        return spikeMark;
+
+    }
+
+    protected void autoDrive(boolean blueTeam, boolean isBackStage) throws InterruptedException {
 
 //TODO       autonomous period that hopefully works and scores many points for us
 
@@ -141,8 +187,18 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         robot.setRightClawPositionAndDirection(1, Servo.Direction.FORWARD);
         robot.setLeftClawPositionAndDirection(1, Servo.Direction.REVERSE);
 
-        // go forward 20 in
-        robot.encoderDrive(MAX_AUTO_SPEED,20,20,8);
+        // go forward 10 in
+        robot.encoderDrive(MAX_AUTO_SPEED,10,10,8);
+
+        ///TESTING CODE TAKE OUT LATER
+        while (opModeIsActive()) {
+            testSpikePos();
+        }
+        //TAKE OUT TESTING CODE ABOVE
+
+        int spikePos = determineSpikePos();
+        telemetry.addData("Spike Pos", spikePos);
+        robot.encoderDrive(MAX_AUTO_SPEED,10,10,8);
 
         if (spikePos == 1) {
             // turn right
