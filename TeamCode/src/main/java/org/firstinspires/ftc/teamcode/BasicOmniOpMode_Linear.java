@@ -37,16 +37,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.android.AndroidSoundPool;
 
-@TeleOp(name = "Basic: Omni Linear OpMode", group = "Linear OpMode")
-public class BasicOmniOpMode_Linear extends LinearOpMode {
+public abstract class BasicOmniOpMode_Linear extends LinearOpMode {
     RobotHardware robot = new RobotHardware(this);
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     private boolean hasEndGameRun = false;
     private double startTime;
 
-    @Override
-    public void runOpMode() throws InterruptedException{
+
+    public void teleOpDrive(boolean blueTeam) throws InterruptedException{
         robot.init();
 
         // Wait for the game to start (driver presses PLAY)
@@ -60,11 +59,18 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
         while (opModeIsActive()) {
             double max;
 
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial = gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral = -gamepad1.left_stick_x;
+            double axial = 0;  // Note: pushing stick forward gives negative value
+            double lateral = 0;
             double yaw = gamepad1.right_stick_x;
-
+            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+            if (blueTeam) {
+                axial = gamepad1.left_stick_x;  // Note: pushing stick forward gives negative value
+                lateral = gamepad1.left_stick_y;
+            } else {
+                axial =
+                        gamepad1.left_stick_x;  // Note: pushing stick forward gives negative value
+                lateral = -gamepad1.left_stick_y;
+            }j
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
             double leftFrontPower = axial + lateral - yaw;
@@ -126,8 +132,8 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
             //wrist
             if (gamepad1.x || gamepad1.y || gamepad2.x || gamepad2.y) {
-                double wristPosition = (gamepad1.x || gamepad2.x) ? RobotHardware.WRIST_PLACE_POSITION : RobotHardware.WRIST_PICKUP_POSITION;
-                Servo.Direction wristDirection = (gamepad1.x || gamepad2.x) ? Servo.Direction.FORWARD : Servo.Direction.FORWARD;
+                double wristPosition = (gamepad1.y || gamepad2.y) ? RobotHardware.WRIST_PLACE_POSITION : RobotHardware.WRIST_PICKUP_POSITION;
+                Servo.Direction wristDirection = Servo.Direction.FORWARD;
                 robot.setWristPositionAndDirection(wristPosition, wristDirection);
 
             }

@@ -148,7 +148,6 @@ public class RobotHardware {
         shaftMotor = myOpMode.hardwareMap.get(DcMotor.class, "shaftMotor");
         lowerLimitSwitch = myOpMode.hardwareMap.get(TouchSensor.class, "lowerLimitSwitch");
         upperLimitSwitch = myOpMode.hardwareMap.get(TouchSensor.class, "upperLimitSwitch");
-        //TODO: remember the SEMI-COLONS!
 
         wrist = myOpMode.hardwareMap.get(Servo.class, "wrist");
         leftClaw = myOpMode.hardwareMap.get(Servo.class, "leftClaw");
