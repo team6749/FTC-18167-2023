@@ -226,7 +226,7 @@ public class RobotHardware {
         visionPortal = builder.build();
 
         // Set confidence threshold for TFOD recognitions, at any time.
-        tfod.setMinResultConfidence(0.5f);
+        tfod.setMinResultConfidence(0.4f);
 
         // Disable or re-enable the TFOD processor at any time.
         visionPortal.setProcessorEnabled(tfod, true);

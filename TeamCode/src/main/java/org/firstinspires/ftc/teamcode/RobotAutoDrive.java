@@ -135,81 +135,114 @@ public abstract class RobotAutoDrive extends LinearOpMode {
     }
 
 
-    public int testSpikePos() {
-        telemetry.addData("Start Detection","");
-        telemetry.update();
-        List<Recognition> currentRecognitions = robot.tfod.getFreshRecognitions();
-        if (currentRecognitions != null) {
-            telemetry.addData("# Objects Detected", currentRecognitions.size());
-            telemetry.update();
+//    public int testSpikePos() {
+//        telemetry.addData("Start Detection","");
+//        telemetry.update();
+//        List<Recognition> currentRecognitions = robot.tfod.getFreshRecognitions();
+//        if (currentRecognitions != null) {
+//            telemetry.addData("# Objects Detected", currentRecognitions.size());
+//            telemetry.update();
+//
+//
+//        // Step through the list of recognitions and display info for each one.
+//        for (Recognition recognition : currentRecognitions) {
+//
+//            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
+//            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+//
+//            telemetry.addData(""," ");
+//            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+//            telemetry.addData("- Position", "%.0f / %.0f", x, y);
+//            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
+//
+//            telemetry.addData("- Left/Right", "%.0f x %.0f", recognition.getLeft(), recognition.getRight());
+//            telemetry.update();
+//
+//        }   // end for() loop
+//        }
+//        sleep(50);
+//
+//        return -1;
+//    }
 
+    public int determineSpikePos() throws InterruptedException {
+        int spikeMark = 1;
+        List<Recognition> currentRecognitions = getRecognitions(null);
+        currentRecognitions = getRecognitions(currentRecognitions);
+        currentRecognitions = getRecognitions(currentRecognitions);
 
-        // Step through the list of recognitions and display info for each one.
-        for (Recognition recognition : currentRecognitions) {
+        if (currentRecognitions != null && currentRecognitions.size() > 0) {
+            // Step through the list of recognitions and display info for each one.
+            for (Recognition recognition : currentRecognitions) {
+                if ("Pixel".equals(recognition.getLabel())) {
+                    double x = (recognition.getLeft() + recognition.getRight()) / 2;
+                    double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
 
-            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
-            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+                    telemetry.addData(""," ");
+                    telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+                    telemetry.addData("- Position", "%.0f / %.0f", x, y);
+                    telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
 
-            telemetry.addData(""," ");
-            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-            telemetry.addData("- Position", "%.0f / %.0f", x, y);
-            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
-
-            telemetry.addData("- Left/Right", "%.0f x %.0f", recognition.getLeft(), recognition.getRight());
-            telemetry.update();
-
-        }   // end for() loop
-        }
-        sleep(50);
-
-        return -1;
-    }
-
-    public int determineSpikePos() {
-        int spikeMark = 2;
-        List<Recognition> currentRecognitions = robot.tfod.getRecognitions();
-        telemetry.addData("# Objects Detected", currentRecognitions.size());
-
-        // Step through the list of recognitions and display info for each one.
-        for (Recognition recognition : currentRecognitions) {
-            // TODO -- NOT SURE THIS IS the right label
-            if ("White Pixel".equals(recognition.getLabel())) {
-                double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
-                if (x < -10) {
-                    spikeMark = 1;
-                } else if (x > 10) {
-                    spikeMark = 3;
-                } else {
-                    spikeMark = 2;
+                    telemetry.addData("- Left/Right", "%.0f x %.0f", recognition.getLeft(), recognition.getRight());
+                    telemetry.update();
+                    sleep(4000);
+                    if (x > 30 && x < 100) {
+                        spikeMark = 2;
+                    } else if (x > 100) {
+                        spikeMark = 3;
+                    }
                 }
-            }
-        }   // end for() loop
+            }   // end for() loop
+        } else {
+                robot.turn(MAX_AUTO_TURN, -20, 3);
+                currentRecognitions = getRecognitions(currentRecognitions);
+                currentRecognitions = getRecognitions(currentRecognitions);
+                currentRecognitions = getRecognitions(currentRecognitions);
+                if (currentRecognitions.size() > 0) {
+                    spikeMark = 3;
+                }
+//                robot.turn(MAX_AUTO_TURN, 20, 3);
+        }
         return spikeMark;
 
+    }
+
+    private List<Recognition> getRecognitions(List<Recognition> currentRecognitions) {
+        if (currentRecognitions == null || currentRecognitions.size() == 0) {
+            sleep(50);
+            currentRecognitions = robot.tfod.getRecognitions();
+            if (currentRecognitions != null) {
+                telemetry.addData("# Objects Detected", currentRecognitions.size());
+                telemetry.update();
+            }
+        }
+        return currentRecognitions;
     }
 
     protected void autoDrive(boolean blueTeam, boolean isBackStage) throws InterruptedException {
 
 //TODO       autonomous period that hopefully works and scores many points for us
 
-        ///TESTING CODE TAKE OUT LATER
-        while (opModeIsActive() && !isStopRequested()) {
-            testSpikePos();
-        }
-        //TAKE OUT TESTING CODE ABOVE
+//        ///TESTING CODE TAKE OUT LATER
+//        while (opModeIsActive() && !isStopRequested()) {
+//            testSpikePos();
+//        }
+//        //TAKE OUT TESTING CODE ABOVE
 
         //close claws
         robot.setRightClawPositionAndDirection(1, Servo.Direction.FORWARD);
         robot.setLeftClawPositionAndDirection(1, Servo.Direction.REVERSE);
 
         // go forward 10 in
-        robot.encoderDrive(MAX_AUTO_SPEED,10,10,8);
+        robot.encoderDrive(MAX_AUTO_SPEED,16,16,8);
 
 
 
         int spikePos = determineSpikePos();
         telemetry.addData("Spike Pos",
                 spikePos);
+        telemetry.update();
+        while (opModeIsActive()) {}
         robot.encoderDrive(MAX_AUTO_SPEED,10,10,8);
 
         if (spikePos == 1) {
@@ -225,6 +258,9 @@ public abstract class RobotAutoDrive extends LinearOpMode {
             robot.turn(MAX_AUTO_TURN, 90, 3);
             robot.turn(MAX_AUTO_TURN, 60, 3);
         }
+
+
+
         robot.dropArmForPixelPickup();
 
         // place pixel
