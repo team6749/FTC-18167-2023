@@ -326,37 +326,36 @@ public class RobotHardware {
     }
 
     public void setLeftClawPositionAndDirection(double leftClawPosition, Servo.Direction leftClawDirection) {
-        leftClaw.setDirection(leftClawDirection);
+        leftClaw.setDirection(Servo.Direction.REVERSE);
         leftClaw.setPosition(leftClawPosition);
     }
 
     public void setRightClawPositionAndDirection(double rightClawPosition, Servo.Direction rightClawDirection) {
-        rightClaw.setDirection(rightClawDirection);
+        rightClaw.setDirection(Servo.Direction.FORWARD);
         rightClaw.setPosition(rightClawPosition);
      }
 
     public void raiseOrLowerArm (int newLocation, int deviation) {
-        raiseOrLowerArm(newLocation, deviation, 10);
+        raiseOrLowerArm(newLocation, deviation, 3);
     }
 
      public void raiseOrLowerArm (int newLocation, int deviation, double timeoutSec) {
-//        int negNewLocation = Math.abs(newLocation) * -1;
+        int negNewLocation = Math.abs(newLocation) * -1;
         boolean goingUp = newLocation < baseRotationMotor.getCurrentPosition();
-//        int loopBreakPoint = goingUp ? negNewLocation + deviation : negNewLocation - deviation;
+        int loopBreakPoint = goingUp ? negNewLocation + deviation : negNewLocation - deviation;
          rotationMotorSetPoint = newLocation;
 
-//         double timeoutTime = myOpMode.getRuntime() + timeoutMs;
-//         while (myOpMode.opModeIsActive() &&
-//                 myOpMode.getRuntime() < timeoutTime &&
-//                 ((goingUp && baseRotationMotor.getCurrentPosition() < loopBreakPoint)
-//                         || (!goingUp && baseRotationMotor.getCurrentPosition() > loopBreakPoint))) {
+         double timeoutTime = myOpMode.getRuntime() + timeoutSec;
+         while (myOpMode.opModeIsActive() &&
+                 myOpMode.getRuntime() < timeoutTime &&
+                 ((goingUp && baseRotationMotor.getCurrentPosition() < loopBreakPoint)
+                         || (!goingUp && baseRotationMotor.getCurrentPosition() > loopBreakPoint))) {
          myOpMode.telemetry.addData((goingUp ? "Lifting" : "Dropping")  + " arm to ", newLocation);
          myOpMode.telemetry.update();
              runClosedLoops();
-
-
-//         }
-//         sleep(60);
+             myOpMode.sleep(10);
+         }
+         runClosedLoops();
      }
 
      public void runClosedLoops() {
@@ -368,7 +367,14 @@ public class RobotHardware {
         double error = rotationMotorSetPoint - baseRotationMotor.getCurrentPosition();
         double cosOfCurrent = Math.cos(Math.toRadians(tprToDegrees(baseRotationMotor.getCurrentPosition() + LEVEL_OFFSET)));
         double calculated = ((cosOfCurrent * GRAVITY_FORCE) + (error * p));
+        double voltage = myOpMode.hardwareMap.voltageSensor.get("Control Hub").getVoltage();
         double maxPower = 0.5;
+        if (voltage > 13.0) {
+            maxPower = 0.35;
+        } else if (voltage > 12) {
+            maxPower = 0.4;
+        }
+
         baseRotationMotor.setPower(Math.min(Math.max(-maxPower, -calculated), maxPower));
         baseRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
@@ -603,12 +609,12 @@ public class RobotHardware {
         //         rotate wrist
         setWristPositionAndDirection(RobotHardware.WRIST_PICKUP_POSITION, Servo.Direction.FORWARD);
 
-        sleep(1000);
+        myOpMode.sleep(200);
 
         // base rotation down
         raiseOrLowerArm(-300, 50);
-        sleep(1000);
-        raiseOrLowerArm(-200, 50);
+        myOpMode.sleep(200);
+        raiseOrLowerArm(-150, 50);
 
     }
 

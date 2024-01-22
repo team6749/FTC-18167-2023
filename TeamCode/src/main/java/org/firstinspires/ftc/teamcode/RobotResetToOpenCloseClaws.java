@@ -29,26 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.lynx.LynxVoltageSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /*
  * This OpMode illustrates using a camera to locate and drive towards a specific AprilTag.
@@ -90,8 +73,8 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-@Autonomous(name = "ResetToStartingPos", group = "Autonomous")
-public class RobotResetToStartingPosition extends LinearOpMode {
+@Autonomous(name = "ResetOpenCloseClaws", group = "Autonomous")
+public class RobotResetToOpenCloseClaws extends LinearOpMode {
 
     RobotHardware robot = new RobotHardware(this);
 
@@ -100,51 +83,17 @@ public class RobotResetToStartingPosition extends LinearOpMode {
         robot.init();
 
 
-        // Wait for driver to press start
-        telemetry.addData("init complete", "");
-        telemetry.update();
+
         waitForStart();
 
 
-//       Iterator voltageIter = hardwareMap.voltageSensor.iterator();
-//       while (voltageIter.hasNext()) {
-//           LynxVoltageSensor obj = (LynxVoltageSensor) voltageIter.next();
-//           telemetry.addData("name ", obj.getDeviceName());
-//
-//           telemetry.addData("voltage ","%4.2f", obj.getVoltage());
-//       }
-//
-//        List<HardwareMap.DeviceMapping<? extends HardwareDevice>> everything= hardwareMap.allDeviceMappings;
-//        for (HardwareMap.DeviceMapping<? extends HardwareDevice> hd:
-//        everything) {
-//            telemetry.addData("names ", hd.entrySet());
-//
-//        }
-//       double voltage = hardwareMap.voltageSensor.get("Control Hub").getVoltage();
-//        telemetry.addData("voltage ","%4.2f", voltage);
-//telemetry.update() ;
-//        while (opModeIsActive()) {}
-
-        // base rotation up
-        robot.raiseOrLowerArm(-400, 100);
-
-//         rotate wrist
-        robot.setWristPositionAndDirection(RobotHardware.WRIST_UP_POSITION, Servo.Direction.FORWARD);
-        sleep(200);
-       robot.detractArm();
-        // base rotation down
-        robot.raiseOrLowerArm(-300,100);
-        sleep(200);
-        // base rotation down
-        robot.raiseOrLowerArm(-200,100);
 
 
+        // place pixel
+        robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
+        robot.setLeftClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
 
-//        // place pixel
-//        robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
-//        robot.setLeftClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
-//
-//        sleep(3000);
+        sleep(3000);
 
         // place pixel
         robot.setRightClawPositionAndDirection(RobotHardware.CLAW_CLOSED_POSITION, Servo.Direction.FORWARD);
@@ -152,10 +101,6 @@ public class RobotResetToStartingPosition extends LinearOpMode {
 
         sleep(3000);
 
-        while (opModeIsActive()) {
-            robot.runClosedLoops();
-
-        }
 
     }
 
