@@ -41,8 +41,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.android.AndroidSoundPool;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+
+import java.util.concurrent.TimeUnit;
 
 
 public class RobotHardware {
@@ -101,7 +106,7 @@ public class RobotHardware {
     public static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     public TfodProcessor tfod;
     public VisionPortal visionPortal;
-
+    public AprilTagProcessor aprilTag;
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public RobotHardware(LinearOpMode opmode) {
         myOpMode = opmode;
@@ -172,7 +177,7 @@ public class RobotHardware {
 
     }
 
-    public void initTfod() {
+    public void initCameraTfodAndAprilTags() {
 
         // Create the TensorFlow processor by using a builder.
         tfod = new TfodProcessor.Builder()
@@ -219,8 +224,22 @@ public class RobotHardware {
         // If set "false", monitor shows camera view without annotations.
         //builder.setAutoStopLiveView(false);
 
+        //April Tags
+        // Create the AprilTag processor by using a builder.
+        aprilTag = new AprilTagProcessor.Builder().build();
+
+        // Adjust Image Decimation to trade-off detection-range for detection-rate.
+        // eg: Some typical detection data using a Logitech C920 WebCam
+        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
+        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
+        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
+        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
+        // Note: Decimation can be changed on-the-fly to adapt during a match.
+        aprilTag.setDecimation(2);
+
         // Set and enable the processor.
         builder.addProcessor(tfod);
+        builder.addProcessor(aprilTag);
 
         // Build the Vision Portal, using the above settings.
         visionPortal = builder.build();
@@ -233,7 +252,42 @@ public class RobotHardware {
 
     }   // end method initTfod()
 
+    /*
+      Manually set the camera gain and exposure.
+      This can only be called AFTER calling initAprilTag(), and only works for Webcams;
+     */
+    private void setManualExposure(int exposureMS, int gain) {
+        // Wait for the camera to be open, then use the controls
 
+        if (visionPortal == null) {
+            return;
+        }
+
+        // Make sure camera is streaming before we try to set the exposure controls
+        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            myOpMode.telemetry.addData("Camera", "Waiting");
+            myOpMode.telemetry.update();
+            while (!myOpMode.isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+            myOpMode.telemetry.addData("Camera", "Ready");
+            myOpMode.telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!myOpMode.isStopRequested()) {
+            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
+            sleep(20);
+            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+            gainControl.setGain(gain);
+            sleep(20);
+        }
+    }
 
     /**
      * Pass the requested wheel motor powers to the appropriate hardware drive motors.
@@ -524,7 +578,7 @@ public class RobotHardware {
 
         while (!isLowerPressed && myOpMode.opModeIsActive()) {
             runClosedLoops();
-            setShaftPowerAndDirection(1, DcMotorSimple.Direction.FORWARD);
+            setShaftPowerAndDirection(.75, DcMotorSimple.Direction.FORWARD);
             sleep(50);
             isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
             myOpMode.telemetry.addData("revs", revs++);
@@ -549,12 +603,12 @@ public class RobotHardware {
         //         rotate wrist
         setWristPositionAndDirection(RobotHardware.WRIST_PICKUP_POSITION, Servo.Direction.FORWARD);
 
-//        sleep(30);
+        sleep(1000);
 
         // base rotation down
         raiseOrLowerArm(-300, 50);
+        sleep(1000);
         raiseOrLowerArm(-200, 50);
-        raiseOrLowerArm(20, 50);
 
     }
 
@@ -565,7 +619,7 @@ public class RobotHardware {
 
         while (isUpperPressed && myOpMode.opModeIsActive()) {
             runClosedLoops();
-            setShaftPowerAndDirection(1, DcMotorSimple.Direction.REVERSE);
+            setShaftPowerAndDirection(.75, DcMotorSimple.Direction.REVERSE);
             sleep(50);
             isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
             myOpMode.telemetry.addData("revs", revs++);
@@ -576,9 +630,10 @@ public class RobotHardware {
     
 
     public void sleep(int milliseconds) {
+//        myOpMode.sleep(milliseconds);
 //        int iterations = milliseconds / 20;
 //        for (int i = 0; i < iterations; i++) {
-//            sleep(20);
+//            myOpMode.sleep(20);
 //            runClosedLoops();
 //        }
     }

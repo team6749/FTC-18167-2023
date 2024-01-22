@@ -29,11 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -104,9 +100,9 @@ public abstract class RobotAutoDrive extends LinearOpMode {
     final double MAX_AUTO_STRAFE = 1.0;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_TURN = 0.8;   //  Clip the turn speed to this max value (adjust for your robot)
 
-    private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
-    private VisionPortal visionPortal;               // Used to manage the video source.
-    private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
+    private static int iter = 0;
+//    private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
+//              // Used for managing the AprilTag detection process.
     private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
 
     private boolean targetFound = false;
@@ -121,7 +117,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
         // Initialize the Apriltag Detection process
 //        initAprilTag();
-        robot.initTfod();
+        robot.initCameraTfodAndAprilTags();
 
 //        if (USE_WEBCAM)
 //            setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
@@ -135,73 +131,78 @@ public abstract class RobotAutoDrive extends LinearOpMode {
     }
 
 
-//    public int testSpikePos() {
-//        telemetry.addData("Start Detection","");
-//        telemetry.update();
-//        List<Recognition> currentRecognitions = robot.tfod.getFreshRecognitions();
-//        if (currentRecognitions != null) {
-//            telemetry.addData("# Objects Detected", currentRecognitions.size());
-//            telemetry.update();
-//
-//
-//        // Step through the list of recognitions and display info for each one.
-//        for (Recognition recognition : currentRecognitions) {
-//
-//            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
-//            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
-//
-//            telemetry.addData(""," ");
-//            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-//            telemetry.addData("- Position", "%.0f / %.0f", x, y);
-//            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
-//
-//            telemetry.addData("- Left/Right", "%.0f x %.0f", recognition.getLeft(), recognition.getRight());
-//            telemetry.update();
-//
-//        }   // end for() loop
-//        }
-//        sleep(50);
-//
-//        return -1;
-//    }
+    public int testSpikePos() throws InterruptedException{
+
+        telemetry.addData("Start Detection","");
+        telemetry.update();
+        List<Recognition> currentRecognitions = robot.tfod.getFreshRecognitions();
+        if (currentRecognitions != null) {
+            telemetry.addData("# Objects Detected", currentRecognitions.size());
+            telemetry.update();
+
+
+        // Step through the list of recognitions and display info for each one.
+        for (Recognition recognition : currentRecognitions) {
+
+            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
+            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+
+            telemetry.addData(""," ");
+            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+            telemetry.addData("- Position", "%.0f / %.0f", x, y);
+            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
+
+            telemetry.addData("- Left/Right", "%.0f x %.0f", recognition.getLeft(), recognition.getRight());
+            telemetry.update();
+
+        }   // end for() loop
+        }
+        sleep(50);
+
+        return -1;
+    }
 
     public int determineSpikePos() throws InterruptedException {
         int spikeMark = 1;
+        robot.turn(MAX_AUTO_TURN, 20, 3);
         List<Recognition> currentRecognitions = getRecognitions(null);
         currentRecognitions = getRecognitions(currentRecognitions);
         currentRecognitions = getRecognitions(currentRecognitions);
 
         if (currentRecognitions != null && currentRecognitions.size() > 0) {
-            // Step through the list of recognitions and display info for each one.
-            for (Recognition recognition : currentRecognitions) {
-                if ("Pixel".equals(recognition.getLabel())) {
-                    double x = (recognition.getLeft() + recognition.getRight()) / 2;
-                    double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+            spikeMark = 2;
+//            // Step through the list of recognitions and display info for each one.
+//            for (Recognition recognition : currentRecognitions) {
+//                if ("Pixel".equals(recognition.getLabel())) {
+//                    double x = (recognition.getLeft() + recognition.getRight()) / 2;
+//                    double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+//
+//                    telemetry.addData(""," ");
+//                    telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+//                    telemetry.addData("- Position", "%.0f / %.0f", x, y);
+//                    telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
+//
+//                    telemetry.addData("- Left/Right", "%.0f x %.0f", recognition.getLeft(), recognition.getRight());
+//                    telemetry.update();
+//                    sleep(1000);
+//                    if (x > 30 && x < 300) {
+//                        spikeMark = 2;
+//                    } else if (x > 300) {
+//                        spikeMark = 3;
+//                    }
+//                }
+//            }   // end for() loop
+            robot.turn(MAX_AUTO_TURN, -20, 3);
 
-                    telemetry.addData(""," ");
-                    telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-                    telemetry.addData("- Position", "%.0f / %.0f", x, y);
-                    telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
-
-                    telemetry.addData("- Left/Right", "%.0f x %.0f", recognition.getLeft(), recognition.getRight());
-                    telemetry.update();
-                    sleep(4000);
-                    if (x > 30 && x < 100) {
-                        spikeMark = 2;
-                    } else if (x > 100) {
-                        spikeMark = 3;
-                    }
-                }
-            }   // end for() loop
         } else {
-                robot.turn(MAX_AUTO_TURN, -20, 3);
+                robot.turn(MAX_AUTO_TURN, -40, 3);
                 currentRecognitions = getRecognitions(currentRecognitions);
                 currentRecognitions = getRecognitions(currentRecognitions);
                 currentRecognitions = getRecognitions(currentRecognitions);
                 if (currentRecognitions.size() > 0) {
                     spikeMark = 3;
                 }
-//                robot.turn(MAX_AUTO_TURN, 20, 3);
+                robot.turn(MAX_AUTO_TURN, 20, 3);
         }
         return spikeMark;
 
@@ -209,10 +210,11 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
     private List<Recognition> getRecognitions(List<Recognition> currentRecognitions) {
         if (currentRecognitions == null || currentRecognitions.size() == 0) {
-            sleep(50);
+            sleep(300);
+            robot.tfod.getFreshRecognitions();
             currentRecognitions = robot.tfod.getRecognitions();
             if (currentRecognitions != null) {
-                telemetry.addData("# Objects Detected", currentRecognitions.size());
+                telemetry.addData("# Objects Detected " + iter++, currentRecognitions.size());
                 telemetry.update();
             }
         }
@@ -223,45 +225,47 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
 //TODO       autonomous period that hopefully works and scores many points for us
 
-//        ///TESTING CODE TAKE OUT LATER
-//        while (opModeIsActive() && !isStopRequested()) {
-//            testSpikePos();
-//        }
-//        //TAKE OUT TESTING CODE ABOVE
+
 
         //close claws
         robot.setRightClawPositionAndDirection(1, Servo.Direction.FORWARD);
         robot.setLeftClawPositionAndDirection(1, Servo.Direction.REVERSE);
 
         // go forward 10 in
-        robot.encoderDrive(MAX_AUTO_SPEED,16,16,8);
+        robot.encoderDrive(MAX_AUTO_SPEED,17,17,8);
 
-
+//        ///TESTING CODE TAKE OUT LATER
+//        robot.turn(MAX_AUTO_TURN, 20, 3);
+//        while (opModeIsActive() && !isStopRequested()) {
+//            testSpikePos();
+//        }
+//        //TAKE OUT TESTING CODE ABOVE
 
         int spikePos = determineSpikePos();
         telemetry.addData("Spike Pos",
                 spikePos);
         telemetry.update();
-        while (opModeIsActive()) {}
-        robot.encoderDrive(MAX_AUTO_SPEED,10,10,8);
 
         if (spikePos == 1) {
             // turn right
             robot.turn(MAX_AUTO_TURN, -90, 3);
-            robot.turn(MAX_AUTO_TURN, -60, 3);
+            robot.turn(MAX_AUTO_TURN, -70, 3);
         } else if (spikePos == 2) {
             // turn right
             robot.turn(MAX_AUTO_TURN, -90, 3);
             robot.turn(MAX_AUTO_TURN, -90, 3);
+            robot.turn(MAX_AUTO_TURN, -30, 3);
         } else {
             // turn left
-            robot.turn(MAX_AUTO_TURN, 90, 3);
-            robot.turn(MAX_AUTO_TURN, 60, 3);
+            robot.turn(MAX_AUTO_TURN, -90, 3);
+            robot.turn(MAX_AUTO_TURN, -90, 3);
+            robot.turn(MAX_AUTO_TURN, -30, 3);
         }
 
 
 
         robot.dropArmForPixelPickup();
+        while (opModeIsActive()) {}
 
         // place pixel
         robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
@@ -398,69 +402,34 @@ public abstract class RobotAutoDrive extends LinearOpMode {
     /**
      * Initialize the AprilTag processor.
      */
-    private void initAprilTag() {
-        // Create the AprilTag processor by using a builder.
-        aprilTag = new AprilTagProcessor.Builder().build();
+//    private void initAprilTag() {
+//        // Create the AprilTag processor by using a builder.
+//        aprilTag = new AprilTagProcessor.Builder().build();
+//
+//        // Adjust Image Decimation to trade-off detection-range for detection-rate.
+//        // eg: Some typical detection data using a Logitech C920 WebCam
+//        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
+//        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
+//        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
+//        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
+//        // Note: Decimation can be changed on-the-fly to adapt during a match.
+//        aprilTag.setDecimation(2);
+//
+//        // Create the vision portal by using a builder.
+//        if (USE_WEBCAM) {
+//            visionPortal = new VisionPortal.Builder()
+//                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+//                    .addProcessor(aprilTag)
+//                    .build();
+//        } else {
+//            visionPortal = new VisionPortal.Builder()
+//                    .setCamera(BuiltinCameraDirection.BACK)
+//                    .addProcessor(aprilTag)
+//                    .build();
+//        }
+//    }
 
-        // Adjust Image Decimation to trade-off detection-range for detection-rate.
-        // eg: Some typical detection data using a Logitech C920 WebCam
-        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
-        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
-        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
-        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
-        // Note: Decimation can be changed on-the-fly to adapt during a match.
-        aprilTag.setDecimation(2);
 
-        // Create the vision portal by using a builder.
-        if (USE_WEBCAM) {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                    .addProcessor(aprilTag)
-                    .build();
-        } else {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(BuiltinCameraDirection.BACK)
-                    .addProcessor(aprilTag)
-                    .build();
-        }
-    }
-
-    /*
-     Manually set the camera gain and exposure.
-     This can only be called AFTER calling initAprilTag(), and only works for Webcams;
-    */
-    private void setManualExposure(int exposureMS, int gain) {
-        // Wait for the camera to be open, then use the controls
-
-        if (visionPortal == null) {
-            return;
-        }
-
-        // Make sure camera is streaming before we try to set the exposure controls
-        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            telemetry.addData("Camera", "Waiting");
-            telemetry.update();
-            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
-                sleep(20);
-            }
-            telemetry.addData("Camera", "Ready");
-            telemetry.update();
-        }
-
-        // Set camera controls unless we are stopping.
-        if (!isStopRequested()) {
-            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
-            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
-                exposureControl.setMode(ExposureControl.Mode.Manual);
-                sleep(50);
-            }
-            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
-            sleep(20);
-            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
-            gainControl.setGain(gain);
-            sleep(20);
-        }
-    }
 
     public boolean driveToAprilTag (boolean blueTeam,int spikePos) {
 
@@ -472,7 +441,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         double  turn            = 0;
 
         // Step through the list of detected tags and look for a matching tag
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        List<AprilTagDetection> currentDetections = robot.aprilTag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             // Look to see if we have size info on this tag.
             if (detection.metadata != null) {
