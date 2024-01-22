@@ -569,9 +569,16 @@ public class RobotHardware {
 
         //base rotation all the way up
         raiseOrLowerArm(-1000,100);
+        myOpMode.sleep(100);
         raiseOrLowerArm(-2000,100);
+        myOpMode.sleep(100);
+
         raiseOrLowerArm(-2800,100);
+        myOpMode.sleep(100);
+
         raiseOrLowerArm(-3000,100);
+        myOpMode.sleep(100);
+
         raiseOrLowerArm(-3300,100);
 
 
@@ -582,12 +589,12 @@ public class RobotHardware {
         boolean isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
         int revs = 0;
 
-        while (!isLowerPressed && myOpMode.opModeIsActive()) {
+        while (!isLowerPressed && myOpMode.opModeIsActive() && (revs < 250)) {
             runClosedLoops();
             setShaftPowerAndDirection(.75, DcMotorSimple.Direction.FORWARD);
             sleep(50);
             isLowerPressed = RobotHardware.lowerLimitSwitch.isPressed();
-            myOpMode.telemetry.addData("revs", revs++);
+            myOpMode.telemetry.addData("detract revs", revs++);
             myOpMode.telemetry.update();
         }
         setShaftPowerAndDirection(0, DcMotorSimple.Direction.FORWARD);
@@ -600,16 +607,29 @@ public class RobotHardware {
         // boom all the way out
 
 //        // base rotation to -400
-//        if (baseRotationMotor.getCurrentPosition() < -700) {
-//            raiseOrLowerArm(-600, 100);
-//        }
+        if (baseRotationMotor.getCurrentPosition() < -2000) {
+            raiseOrLowerArm(-2000, 100);
+            myOpMode.sleep(200);
+        }
+        if (baseRotationMotor.getCurrentPosition() < -1500) {
+            raiseOrLowerArm(-1500, 100);
+            myOpMode.sleep(200);
+        }
+        if (baseRotationMotor.getCurrentPosition() < -1000) {
+            raiseOrLowerArm(-1000, 100);
+            myOpMode.sleep(200);
+        }
+        if (baseRotationMotor.getCurrentPosition() < -600) {
+            raiseOrLowerArm(-600, 100);
+            myOpMode.sleep(200);
+        }
         raiseOrLowerArm(-400, 100);
 
         extendArm();
         //         rotate wrist
         setWristPositionAndDirection(RobotHardware.WRIST_PICKUP_POSITION, Servo.Direction.FORWARD);
 
-        myOpMode.sleep(200);
+        myOpMode.sleep(300);
 
         // base rotation down
         raiseOrLowerArm(-300, 50);
@@ -623,12 +643,12 @@ public class RobotHardware {
         boolean isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
         int revs = 0;
 
-        while (isUpperPressed && myOpMode.opModeIsActive()) {
+        while (isUpperPressed && myOpMode.opModeIsActive() && (revs < 250)) {
             runClosedLoops();
             setShaftPowerAndDirection(.75, DcMotorSimple.Direction.REVERSE);
             sleep(50);
             isUpperPressed = RobotHardware.upperLimitSwitch.isPressed();
-            myOpMode.telemetry.addData("revs", revs++);
+            myOpMode.telemetry.addData("extend revs", revs++);
             myOpMode.telemetry.update();
         }
         setShaftPowerAndDirection(0, DcMotorSimple.Direction.REVERSE);
