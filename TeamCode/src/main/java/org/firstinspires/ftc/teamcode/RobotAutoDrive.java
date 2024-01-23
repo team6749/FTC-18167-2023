@@ -226,7 +226,6 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 //TODO       autonomous period that hopefully works and scores many points for us
 
 
-
         //close claws
         robot.setRightClawPositionAndDirection(1, Servo.Direction.FORWARD);
         robot.setLeftClawPositionAndDirection(1, Servo.Direction.REVERSE);
@@ -252,14 +251,14 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
         sweepToSpikePos(spikePos,blueTeam,isBackStage);
 
-        while (opModeIsActive()) {}
-
         // place pixel
         robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
         telemetry.addData("Right Claw Pos", "%4.2f", RobotHardware.rightClaw.getPosition());
         telemetry.update();
 
         sleep(50);
+
+
 
 // ----------------
         // base rotation up
@@ -271,6 +270,19 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         }
 
         robot.detractArm();
+
+        robot.setWristPositionAndDirection(RobotHardware.WRIST_PLACE_POSITION, Servo.Direction.FORWARD);
+
+        robot.raiseOrLowerArm(-300,100);
+
+        sleep (200);
+
+        robot.raiseOrLowerArm(-200,100);
+
+        // place pixel
+        robot.setRightClawPositionAndDirection(RobotHardware.CLAW_CLOSED_POSITION, Servo.Direction.FORWARD);
+        telemetry.addData("Right Claw Pos", "%4.2f", RobotHardware.rightClaw.getPosition());
+        telemetry.update();
 
         if (blueTeam) {
             if (spikePos == 1) {
@@ -284,8 +296,10 @@ public abstract class RobotAutoDrive extends LinearOpMode {
                 // turn right
                 robot.turn(MAX_AUTO_TURN, -60, 3);
             }
+
             //strafe right
             robot.encoderStrafe(1,-2,-2,1);
+
         } else {
             if (spikePos == 3) {
                 // turn left
@@ -302,42 +316,48 @@ public abstract class RobotAutoDrive extends LinearOpMode {
             //robot.encoderStrafe(1,0,0,1);
         }
 
+        //strafe left
+        robot.encoderStrafe(0.5,26,26,3);
+        robot.encoderStrafe(0.5,-2,-2,2);
+
         //if not backstage, drive forward
         if (isBackStage == false) {
             robot.encoderDrive(MAX_AUTO_SPEED, 40, 40, 5);
         } else {
-            robot.encoderDrive(MAX_AUTO_SPEED, 10, 0, 5);
+            robot.encoderDrive(MAX_AUTO_SPEED, 50, 50, 5);
         }
 
+        while (opModeIsActive()) {}
 
-        boolean aprilTagMoveCompleted = false;
-        while (opModeIsActive() && !aprilTagMoveCompleted ) {
-            aprilTagMoveCompleted = driveToAprilTag(blueTeam, spikePos);
-            robot.runClosedLoops();
-            telemetry.addData("AprilTagCompleted", aprilTagMoveCompleted);
-            telemetry.update();
-        }
 
-        if (targetFound) {
-
-            robot.liftPixelForPlacement();
-
-            // drop pixel
-        robot.setLeftClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.REVERSE);// base rotation up
-            robot.raiseOrLowerArm(-400, 100);
-
-//         rotate wrist
-            robot.setWristPositionAndDirection(RobotHardware.WRIST_UP_POSITION, Servo.Direction.FORWARD);
-
-            robot.detractArm();
-            // base rotation down
-            robot.raiseOrLowerArm(-300,100);
-
-            // base rotation down
-            robot.raiseOrLowerArm(-200,100);
-
-            // base rotation down
-            robot.raiseOrLowerArm(-150,100);
+//        boolean aprilTagMoveCompleted = false;
+//        while (opModeIsActive() && !aprilTagMoveCompleted ) {
+//            aprilTagMoveCompleted = driveToAprilTag(blueTeam, spikePos);
+//            robot.runClosedLoops();
+//            telemetry.addData("AprilTagCompleted", aprilTagMoveCompleted);
+//            telemetry.update();
+//        }
+//
+//        if (targetFound) {
+//
+//            robot.liftPixelForPlacement();
+//
+//            // drop pixel
+//        robot.setLeftClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.REVERSE);// base rotation up
+//            robot.raiseOrLowerArm(-400, 100);
+//
+////         rotate wrist
+//            robot.setWristPositionAndDirection(RobotHardware.WRIST_UP_POSITION, Servo.Direction.FORWARD);
+//
+//            robot.detractArm();
+//            // base rotation down
+//            robot.raiseOrLowerArm(-300,100);
+//
+//            // base rotation down
+//            robot.raiseOrLowerArm(-200,100);
+//
+//            // base rotation down
+//            robot.raiseOrLowerArm(-150,100);
 
             if (blueTeam) {
                 robot.encoderStrafe(MAX_AUTO_SPEED, -20, -20, 3);
@@ -345,7 +365,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
                 robot.encoderStrafe(MAX_AUTO_SPEED, 20, 20, 3);
             }
             robot.encoderDrive(MAX_AUTO_SPEED,5,5,3);
-        }
+//        }
 
 
 
