@@ -336,7 +336,7 @@ public class RobotHardware {
      }
 
     public void raiseOrLowerArm (int newLocation, int deviation) {
-        raiseOrLowerArm(newLocation, deviation, 3);
+        raiseOrLowerArm(newLocation, deviation, 1);
     }
 
      public void raiseOrLowerArm (int newLocation, int deviation, double timeoutSec) {
@@ -519,7 +519,7 @@ public class RobotHardware {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        sleep(100);   // optional pause after each move.
+        sleep(25);   // optional pause after each move.
     }
 
 
@@ -609,19 +609,19 @@ public class RobotHardware {
 //        // base rotation to -400
         if (baseRotationMotor.getCurrentPosition() < -2000) {
             raiseOrLowerArm(-2000, 100);
-            myOpMode.sleep(200);
+            myOpMode.sleep(100);
         }
         if (baseRotationMotor.getCurrentPosition() < -1500) {
             raiseOrLowerArm(-1500, 100);
-            myOpMode.sleep(200);
+            myOpMode.sleep(100);
         }
         if (baseRotationMotor.getCurrentPosition() < -1000) {
             raiseOrLowerArm(-1000, 100);
-            myOpMode.sleep(200);
+            myOpMode.sleep(100);
         }
         if (baseRotationMotor.getCurrentPosition() < -600) {
             raiseOrLowerArm(-600, 100);
-            myOpMode.sleep(200);
+            myOpMode.sleep(100);
         }
         raiseOrLowerArm(-400, 100);
 

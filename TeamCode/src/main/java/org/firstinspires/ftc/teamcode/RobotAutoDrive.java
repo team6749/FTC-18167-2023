@@ -98,7 +98,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
     final double MAX_AUTO_SPEED = 1.0;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_STRAFE = 1.0;   //  Clip the approach speed to this max value (adjust for your robot)
-    final double MAX_AUTO_TURN = 0.8;   //  Clip the turn speed to this max value (adjust for your robot)
+    final double MAX_AUTO_TURN = 1.0;   //  Clip the turn speed to this max value (adjust for your robot)
 
     private static int iter = 0;
 //    private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
@@ -249,7 +249,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 
         robot.dropArmForPixelPickup();
 
-        sweepToSpikePos(spikePos,blueTeam,isBackStage);
+         sweepToSpikePos(spikePos,blueTeam,isBackStage);
 
         // place pixel
         robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
@@ -408,10 +408,10 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         }
         if (spikePos == 1) {
             // turn left
-            robot.turn(MAX_AUTO_TURN, 15 * turnDirectionMultiplier, 3);
+            robot.turn(MAX_AUTO_TURN, 13 * turnDirectionMultiplier, 3);
         } else if (spikePos == 2) {
             // turn right
-            robot.turn(MAX_AUTO_TURN, -40 * turnDirectionMultiplier, 3);
+            robot.turn(MAX_AUTO_TURN, -43 * turnDirectionMultiplier, 3);
         } else {
             // turn left
             robot.turn(MAX_AUTO_TURN, -40 * turnDirectionMultiplier, 3);
