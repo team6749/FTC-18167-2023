@@ -171,6 +171,11 @@ public abstract class BasicOmniOpMode_Linear extends LinearOpMode {
 
             }
 
+            if (gamepad1.start) {
+                //launch drone
+                robot.launchDrone();
+            }
+
             robot.runClosedLoops();
 
 
@@ -199,6 +204,8 @@ public abstract class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("ShaftUpperLimitPressed", RobotHardware.upperLimitSwitch.isPressed());
 
             telemetry.addData("Climbing Button Pressed", gamepad1.back);
+            telemetry.addData("Drone Button Pressed", gamepad1.start);
+            telemetry.addData("Drone Launcher", robot.droneLauncher.getController().getServoPosition(5));
 
             telemetry.addLine("             :)");
 

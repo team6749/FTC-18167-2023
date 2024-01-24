@@ -241,15 +241,25 @@ public abstract class RobotAutoDrive extends LinearOpMode {
 //        //TAKE OUT TESTING CODE ABOVE
 
         int spikePos = determineSpikePos();
-        telemetry.addData("Spike Pos",
-                spikePos);
-        telemetry.update();
+        int currentRotation = spikePos == 3 ? 20 : 0;
 
-        turnToSpikePos(spikePos,blueTeam,isBackStage);
+        telemetry.addData("Spike Pos", spikePos);
+        telemetry.addData("Current Rotation", currentRotation);
+
+        telemetry.update();
+        sleep(2000);
+
+        currentRotation += turnToSpikePos(spikePos,blueTeam,isBackStage);
+
+        telemetry.addData("Current Rotation after turnToSpikePos", currentRotation);
+        telemetry.update();
+        sleep(2000);
 
         robot.dropArmForPixelPickup();
 
-         sweepToSpikePos(spikePos,blueTeam,isBackStage);
+        currentRotation += sweepToSpikePos(spikePos,blueTeam,isBackStage);
+        telemetry.addData("Current Rotation after sweepToSpikePos", currentRotation);
+        telemetry.update();
 
         // place pixel
         robot.setRightClawPositionAndDirection(RobotHardware.CLAW_OPEN_POSITION, Servo.Direction.FORWARD);
@@ -287,8 +297,10 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         if (blueTeam) {
             if (spikePos == 1) {
                 // turn left
-                robot.turn(MAX_AUTO_TURN, -90, 3);
-                robot.turn(MAX_AUTO_TURN, -30, 3);
+                robot.turn(MAX_AUTO_TURN, -120, 3);
+
+//                robot.turn(MAX_AUTO_TURN, -90, 3);
+//                robot.turn(MAX_AUTO_TURN, -30, 3);
             } else if (spikePos == 2) {
                 // turn right
                 robot.turn(MAX_AUTO_TURN, -90, 3);
@@ -303,8 +315,10 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         } else {
             if (spikePos == 3) {
                 // turn left
-                robot.turn(MAX_AUTO_TURN, 90, 3);
-                robot.turn(MAX_AUTO_TURN, 30, 3);
+                robot.turn(MAX_AUTO_TURN, 120, 3);
+
+//                robot.turn(MAX_AUTO_TURN, 90, 3);
+//                robot.turn(MAX_AUTO_TURN, 30, 3);
             } else if (spikePos == 2) {
                 // turn right
                 robot.turn(MAX_AUTO_TURN, 90, 3);
@@ -375,48 +389,61 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         }
     }
 
-    private void turnToSpikePos(int spikePos,boolean blueTeam,boolean isBackStage) throws InterruptedException {
+    private int turnToSpikePos(int spikePos,boolean blueTeam,boolean isBackStage) throws InterruptedException {
         int turnDirectionMultiplier = 1;
         if ((blueTeam && !isBackStage) || (!blueTeam && isBackStage)) {
             turnDirectionMultiplier = -1;
         }
+        int degreesToTurn = -190 * turnDirectionMultiplier;
         if (spikePos == 1) {
             // turn right
-            robot.turn(MAX_AUTO_TURN, -90 * turnDirectionMultiplier, 3);
-            robot.turn(MAX_AUTO_TURN, -70 * turnDirectionMultiplier, 3);
+            degreesToTurn = -160 * turnDirectionMultiplier;
+
+//            robot.turn(MAX_AUTO_TURN, -90 * turnDirectionMultiplier, 3);
+//            robot.turn(MAX_AUTO_TURN, -70 * turnDirectionMultiplier, 3);
         } else if (spikePos == 2) {
             // turn right
-            robot.turn(MAX_AUTO_TURN, -90 * turnDirectionMultiplier, 3);
-            robot.turn(MAX_AUTO_TURN, -90 * turnDirectionMultiplier, 3);
+            robot.encoderDrive(MAX_AUTO_SPEED,3,3,3);
 
-            robot.encoderDrive(MAX_AUTO_SPEED,-3,-3,3);
+            degreesToTurn = -140 * turnDirectionMultiplier;
 
-            robot.turn(MAX_AUTO_TURN, 40 * turnDirectionMultiplier, 3);
-        } else {
-            // turn left
-            robot.turn(MAX_AUTO_TURN, -90 * turnDirectionMultiplier, 3);
-            robot.turn(MAX_AUTO_TURN, -90 * turnDirectionMultiplier, 3);
-            robot.turn(MAX_AUTO_TURN, -10 * turnDirectionMultiplier, 3);
+//            robot.turn(MAX_AUTO_TURN, -90 * turnDirectionMultiplier, 3);
+//            robot.turn(MAX_AUTO_TURN, -90 * turnDirectionMultiplier, 3);
+
+
+//            robot.turn(MAX_AUTO_TURN, 40 * turnDirectionMultiplier, 3);
         }
+//        else {
+            // turn left
+
+//            robot.turn(MAX_AUTO_TURN, -90 * turnDirectionMultiplier, 3);
+//            robot.turn(MAX_AUTO_TURN, -90 * turnDirectionMultiplier, 3);
+//            robot.turn(MAX_AUTO_TURN, -10 * turnDirectionMultiplier, 3);
+//        }
+            robot.turn(MAX_AUTO_TURN, degreesToTurn , 3);
+
+        return degreesToTurn;
 
     }
 
-    private void sweepToSpikePos(int spikePos,boolean blueTeam,boolean isBackStage) throws InterruptedException {
+    private int sweepToSpikePos(int spikePos,boolean blueTeam,boolean isBackStage) throws InterruptedException {
         int turnDirectionMultiplier = 1;
         if ((blueTeam && !isBackStage) || (!blueTeam && isBackStage)) {
             turnDirectionMultiplier = -1;
         }
+        int degreesToTurn = -40 * turnDirectionMultiplier;
         if (spikePos == 1) {
             // turn left
-            robot.turn(MAX_AUTO_TURN, 13 * turnDirectionMultiplier, 3);
+            degreesToTurn = 13 * turnDirectionMultiplier;
         } else if (spikePos == 2) {
             // turn right
-            robot.turn(MAX_AUTO_TURN, -43 * turnDirectionMultiplier, 3);
-        } else {
-            // turn left
-            robot.turn(MAX_AUTO_TURN, -40 * turnDirectionMultiplier, 3);
+            degreesToTurn = -43 * turnDirectionMultiplier;
         }
 
+        // turn left
+        robot.turn(MAX_AUTO_TURN, degreesToTurn, 3);
+
+        return degreesToTurn;
     }
 
     /**

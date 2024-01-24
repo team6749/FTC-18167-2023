@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -96,6 +97,9 @@ public class RobotHardware {
     public static Servo wrist = null;
     public static Servo leftClaw = null;
     public static Servo rightClaw = null;
+
+    public static CRServo droneLauncher = null;
+
     private ElapsedTime runtime = new ElapsedTime();
     static final double     COUNTS_PER_MOTOR_REV    = 288 ;    // eg: Core Hex Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // No External Gearing.
@@ -157,6 +161,7 @@ public class RobotHardware {
         wrist = myOpMode.hardwareMap.get(Servo.class, "wrist");
         leftClaw = myOpMode.hardwareMap.get(Servo.class, "leftClaw");
         rightClaw = myOpMode.hardwareMap.get(Servo.class, "rightClaw");
+        droneLauncher = myOpMode.hardwareMap.get(CRServo.class, "droneLauncher");
 
         myOpMode.telemetry.addData(">", "Hardware Initialized");
         myOpMode.telemetry.update();
@@ -652,6 +657,13 @@ public class RobotHardware {
             myOpMode.telemetry.update();
         }
         setShaftPowerAndDirection(0, DcMotorSimple.Direction.REVERSE);
+    }
+
+    public void launchDrone() {
+//        double currentPosition = droneLauncher.getPosition();
+        droneLauncher.getController().setServoPosition(5,0);
+        myOpMode.sleep(500);
+        droneLauncher.setPower(0);
     }
     
 
