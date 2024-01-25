@@ -247,13 +247,13 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         telemetry.addData("Current Rotation", currentRotation);
 
         telemetry.update();
-        sleep(2000);
+//        sleep(2000);
 
         currentRotation += turnToSpikePos(spikePos,blueTeam,isBackStage);
 
         telemetry.addData("Current Rotation after turnToSpikePos", currentRotation);
         telemetry.update();
-        sleep(2000);
+//        sleep(2000);
 
         robot.dropArmForPixelPickup();
 
@@ -306,7 +306,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
                 robot.turn(MAX_AUTO_TURN, -90, 3);
             } else {
                 // turn right
-                robot.turn(MAX_AUTO_TURN, -60, 3);
+                robot.turn(MAX_AUTO_TURN, -50, 3);
             }
 
             //strafe right
@@ -315,7 +315,7 @@ public abstract class RobotAutoDrive extends LinearOpMode {
         } else {
             if (spikePos == 3) {
                 // turn left
-                robot.turn(MAX_AUTO_TURN, 120, 3);
+                robot.turn(MAX_AUTO_TURN, 140, 3);
 
 //                robot.turn(MAX_AUTO_TURN, 90, 3);
 //                robot.turn(MAX_AUTO_TURN, 30, 3);
@@ -324,23 +324,36 @@ public abstract class RobotAutoDrive extends LinearOpMode {
                 robot.turn(MAX_AUTO_TURN, 90, 3);
             } else {
                 // turn right
-                robot.turn(MAX_AUTO_TURN, 60, 3);
+                robot.turn(MAX_AUTO_TURN, 50, 3);
             }
             //strafe left
-            //robot.encoderStrafe(1,0,0,1);
+            robot.encoderStrafe(1,2,2,1);
         }
 
-        //strafe left
-        robot.encoderStrafe(0.5,26,26,3);
-        robot.encoderStrafe(0.5,-2,-2,2);
+        if (blueTeam) {
+            //strafe left
+            robot.encoderStrafe(0.5, 26, 26, 3);
+            robot.encoderStrafe(0.5, -3, -3, 2);
 
-        //if not backstage, drive forward
-        if (isBackStage == false) {
-            robot.encoderDrive(MAX_AUTO_SPEED, 40, 40, 5);
+            //if not backstage, drive forward
+            if (isBackStage) {
+                robot.encoderDrive(MAX_AUTO_SPEED, 40, 40, 5);
+            } else {
+                robot.encoderDrive(MAX_AUTO_SPEED, 95, 95, 10);
+            }
         } else {
-            robot.encoderDrive(MAX_AUTO_SPEED, 50, 50, 5);
-        }
 
+            //strafe left
+            robot.encoderStrafe(0.5,-26,-26,3);
+            robot.encoderStrafe(0.5,3,3,2);
+
+            //if not backstage, drive forward
+            if (isBackStage) {
+                robot.encoderDrive(MAX_AUTO_SPEED, 40, 40, 5);
+            } else {
+                robot.encoderDrive(MAX_AUTO_SPEED, 95, 95, 10);
+            }
+        }
         while (opModeIsActive()) {}
 
 
@@ -392,12 +405,12 @@ public abstract class RobotAutoDrive extends LinearOpMode {
     private int turnToSpikePos(int spikePos,boolean blueTeam,boolean isBackStage) throws InterruptedException {
         int turnDirectionMultiplier = 1;
         if ((blueTeam && !isBackStage) || (!blueTeam && isBackStage)) {
-            turnDirectionMultiplier = -1;
+            turnDirectionMultiplier = 1;
         }
-        int degreesToTurn = -190 * turnDirectionMultiplier;
+        int degreesToTurn = -200 * turnDirectionMultiplier;
         if (spikePos == 1) {
             // turn right
-            degreesToTurn = -160 * turnDirectionMultiplier;
+            degreesToTurn = -180 * turnDirectionMultiplier;
 
 //            robot.turn(MAX_AUTO_TURN, -90 * turnDirectionMultiplier, 3);
 //            robot.turn(MAX_AUTO_TURN, -70 * turnDirectionMultiplier, 3);
@@ -429,15 +442,15 @@ public abstract class RobotAutoDrive extends LinearOpMode {
     private int sweepToSpikePos(int spikePos,boolean blueTeam,boolean isBackStage) throws InterruptedException {
         int turnDirectionMultiplier = 1;
         if ((blueTeam && !isBackStage) || (!blueTeam && isBackStage)) {
-            turnDirectionMultiplier = -1;
+            turnDirectionMultiplier = 1;
         }
-        int degreesToTurn = -40 * turnDirectionMultiplier;
+        int degreesToTurn = -35 * turnDirectionMultiplier;
         if (spikePos == 1) {
             // turn left
-            degreesToTurn = 13 * turnDirectionMultiplier;
+            degreesToTurn = 24 * turnDirectionMultiplier;j
         } else if (spikePos == 2) {
             // turn right
-            degreesToTurn = -43 * turnDirectionMultiplier;
+            degreesToTurn = -60 * turnDirectionMultiplier;
         }
 
         // turn left
